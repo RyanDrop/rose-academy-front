@@ -1,0 +1,15 @@
+<nav class="step-progress" aria-label="Progresso do cadastro">
+  @for (step of steps(); track step; let index = $index; let isLast = $last) {
+    <div
+      class="step-progress__item"
+      [class.step-progress__item--active]="index + 1 === currentStep()"
+      [class.step-progress__item--complete]="index + 1 < currentStep()"
+    >
+      <span class="step-progress__bullet">{{ index + 1 }}</span>
+      <span class="step-progress__label">{{ step }}</span>
+      @if (!isLast) {
+        <span class="step-progress__line" aria-hidden="true"></span>
+      }
+    </div>
+  }
+</nav>

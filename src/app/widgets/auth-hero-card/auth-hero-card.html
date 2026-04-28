@@ -1,0 +1,49 @@
+<section class="auth-hero-card">
+  <div class="auth-hero-card__glow auth-hero-card__glow--top"></div>
+  <div class="auth-hero-card__glow auth-hero-card__glow--bottom"></div>
+
+  <header class="auth-hero-card__header">
+    <div class="auth-hero-card__brand">
+      <span class="auth-hero-card__brand-mark">RA</span>
+      <span class="auth-hero-card__brand-text">{{ eyebrow() }}</span>
+    </div>
+    <span class="auth-hero-card__accent">{{ accentLabel() }}</span>
+  </header>
+
+  <div class="auth-hero-card__content">
+    <p class="auth-hero-card__eyebrow">Seu treino, sua rotina, sua evolucao</p>
+    <h2 class="auth-hero-card__title">{{ title() }}</h2>
+    <p class="auth-hero-card__subtitle">{{ subtitle() }}</p>
+
+    <div class="auth-hero-card__badges">
+      @for (badge of badges(); track badge) {
+        <span class="auth-hero-card__badge">{{ badge }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="auth-hero-card__illustration" aria-hidden="true">
+    <div class="auth-hero-card__orbit auth-hero-card__orbit--outer"></div>
+    <div class="auth-hero-card__orbit auth-hero-card__orbit--inner"></div>
+    <div class="auth-hero-card__dumbbell auth-hero-card__dumbbell--left"></div>
+    <div class="auth-hero-card__dumbbell auth-hero-card__dumbbell--right"></div>
+
+    <div class="auth-hero-card__figure">
+      <div class="auth-hero-card__figure-head"></div>
+      <div class="auth-hero-card__figure-body"></div>
+      <div class="auth-hero-card__figure-arm auth-hero-card__figure-arm--left"></div>
+      <div class="auth-hero-card__figure-arm auth-hero-card__figure-arm--right"></div>
+      <div class="auth-hero-card__figure-leg auth-hero-card__figure-leg--left"></div>
+      <div class="auth-hero-card__figure-leg auth-hero-card__figure-leg--right"></div>
+    </div>
+  </div>
+
+  <div class="auth-hero-card__metrics">
+    @for (metric of metrics(); track metric.label) {
+      <article class="auth-hero-card__metric">
+        <strong class="auth-hero-card__metric-value">{{ metric.value }}</strong>
+        <span class="auth-hero-card__metric-label">{{ metric.label }}</span>
+      </article>
+    }
+  </div>
+</section>

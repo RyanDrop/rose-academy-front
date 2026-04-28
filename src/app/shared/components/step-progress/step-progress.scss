@@ -1,0 +1,57 @@
+:host {
+  display: block;
+}
+
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--ra-space-2);
+  overflow-x: auto;
+  padding-bottom: var(--ra-space-2);
+}
+
+.step-progress__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ra-space-2);
+  color: rgba(16, 24, 32, 0.42);
+  white-space: nowrap;
+}
+
+.step-progress__item--active,
+.step-progress__item--complete {
+  color: var(--ra-color-secondary);
+}
+
+.step-progress__bullet {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: rgba(16, 24, 32, 0.08);
+  transition: background 180ms ease;
+}
+
+.step-progress__item--active .step-progress__bullet {
+  background: var(--ra-color-primary);
+  color: #fff;
+}
+
+.step-progress__item--complete .step-progress__bullet {
+  background: rgb(157 31 31 / 23%);
+  color: var(--ra-color-primary);
+}
+
+.step-progress__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.step-progress__line {
+  width: 2rem;
+  height: 1px;
+  background: rgba(16, 24, 32, 0.14);
+}

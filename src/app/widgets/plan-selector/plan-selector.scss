@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.plan-selector {
+  display: grid;
+  gap: var(--ra-space-4);
+}
+
+.plan-selector__card {
+  width: 100%;
+  padding: var(--ra-space-5);
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid var(--ra-color-line);
+  border-radius: var(--ra-radius-md);
+  background: var(--ra-color-surface);
+  box-shadow: 0 10px 24px rgba(16, 24, 32, 0.06);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.plan-selector__card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(16, 24, 32, 0.08);
+}
+
+.plan-selector__card--selected {
+  border-color: rgba(88, 41, 51, 0.55);
+  background: linear-gradient(
+    180deg,
+    rgba(88, 41, 51, 0.08),
+    rgba(255, 255, 255, 0.96)
+  );
+  box-shadow: 0 18px 36px rgba(88, 41, 51, 0.16);
+}
+
+.plan-selector__header,
+.plan-selector__price {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ra-space-3);
+}
+
+.plan-selector__name {
+  display: block;
+  font-family: var(--ra-font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.plan-selector__description {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--ra-color-muted);
+  line-height: 1.55;
+}
+
+.plan-selector__badge,
+.plan-selector__perk {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--ra-radius-pill);
+}
+
+.plan-selector__badge {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ra-color-primary-deep);
+  background: rgba(255, 122, 89, 0.12);
+}
+
+.plan-selector__price {
+  margin-top: var(--ra-space-5);
+}
+
+.plan-selector__price strong {
+  font-family: var(--ra-font-heading);
+  font-size: 1.9rem;
+}
+
+.plan-selector__price span {
+  color: var(--ra-color-muted);
+  padding-top: 0.35rem;
+}
+
+.plan-selector__perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ra-space-2);
+  margin-top: var(--ra-space-5);
+}
+
+.plan-selector__perk {
+  padding: 0.45rem 0.8rem;
+  font-size: 0.78rem;
+  background: var(--ra-color-surface-strong);
+  color: var(--ra-color-secondary);
+}

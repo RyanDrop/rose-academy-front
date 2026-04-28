@@ -1,0 +1,31 @@
+<div class="plan-selector">
+  @for (plan of plans(); track plan.taxId) {
+    <button
+      type="button"
+      class="plan-selector__card"
+      [class.plan-selector__card--selected]="selectedTaxId() === plan.taxId"
+      (click)="selectPlan(plan.taxId)"
+    >
+      <div class="plan-selector__header">
+        <div>
+          <span class="plan-selector__name">{{ plan.name }}</span>
+          <span class="plan-selector__description">{{ plan.description }}</span>
+        </div>
+        <span class="plan-selector__badge">
+          {{ plan.billingCycle === 'monthly' ? 'Mensal' : 'Anual' }}
+        </span>
+      </div>
+
+      <div class="plan-selector__price">
+        <strong>{{ plan.price | currency: 'BRL' }}</strong>
+        <span>{{ plan.billingCycle === 'monthly' ? '/mes' : '/ano' }}</span>
+      </div>
+
+      <div class="plan-selector__perks">
+        @for (perk of plan.perks; track perk) {
+          <span class="plan-selector__perk">{{ perk }}</span>
+        }
+      </div>
+    </button>
+  }
+</div>

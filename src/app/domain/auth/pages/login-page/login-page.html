@@ -1,0 +1,145 @@
+<section class="login-page">
+  <div class="login-page__shell">
+    @if (!hasStarted()) {
+      <div class="login-page__entry">
+        <div class="login-page__hero login-page__hero--entry">
+          <ra-auth-hero-card
+            eyebrow="Rose Academy"
+            title="A academia da sua rotina."
+            subtitle="Acesse aulas gravadas, PDFs, desafios e materiais exclusivos no seu ritmo."
+            accentLabel="Mobile first"
+            [badges]="['Videos gravados', 'PDFs praticos', 'Plano personalizado']"
+            [metrics]="heroMetrics"
+          />
+        </div>
+
+        <div class="login-page__start">
+          <span class="login-page__start-label">Start</span>
+          <div
+            class="login-page__start-track"
+            (pointermove)="onDrag($event)"
+            (pointerup)="endDrag()"
+            (pointercancel)="endDrag()"
+            (pointerleave)="endDrag()"
+          >
+            <div
+              class="login-page__start-fill"
+              [style.transform]="'scaleX(' + dragProgress() + ')'"
+            ></div>
+
+            <button
+              type="button"
+              class="login-page__start-thumb"
+              [class.login-page__start-thumb--dragging]="isDraggingStart()"
+              [style.transform]="'translateX(' + dragOffset() + 'px)'"
+              (pointerdown)="startDrag($event)"
+              (pointerup)="endDrag()"
+            >
+              <span class="login-page__start-thumb-text">Start</span>
+              <span class="login-page__start-arrows" aria-hidden="true">
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+            <span class="login-page__start-hint" [style.opacity]="1 - dragProgress()">
+              Arraste para abrir o login
+            </span>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="login-page__panel login-page__panel--cinematic">
+        <div class="login-page__panel-grid">
+          <div class="login-page__panel-hero">
+            <ra-auth-hero-card
+              eyebrow="Rose Academy"
+              title="Seu treino continua daqui."
+              subtitle="Entre para assistir aulas, abrir materiais e seguir a sua evolucao."
+              accentLabel="Login"
+              [badges]="['Acesso rapido', 'Treino em dia', 'Conteudo exclusivo']"
+              [metrics]="heroMetrics"
+            />
+          </div>
+
+          <div class="login-page__panel-form">
+            <div class="login-page__brand">
+              <span class="login-page__brand-mark">RA</span>
+              <div>
+                <span class="login-page__brand-name">Rose Academy</span>
+                <span class="login-page__brand-copy">Area do aluno</span>
+              </div>
+            </div>
+
+            <div class="login-page__header">
+              <span class="login-page__eyebrow">Login</span>
+              <h1 class="login-page__title">Entre para continuar o treino</h1>
+              <p class="login-page__subtitle">
+                Fluxo mockado com validacao completa, pronto para receber integracao com API.
+              </p>
+            </div>
+
+            @if (feedbackMessage()) {
+              <p class="login-page__status login-page__status--info">{{ feedbackMessage() }}</p>
+            }
+
+            @if (successMessage()) {
+              <p class="login-page__status login-page__status--success">{{ successMessage() }}</p>
+            }
+
+            <form class="login-page__form" [formGroup]="loginForm" (ngSubmit)="submit()" novalidate>
+              <div class="login-page__field">
+                <label class="login-page__label" for="login-email">Email</label>
+                <input
+                  id="login-email"
+                  class="login-page__input"
+                  type="email"
+                  formControlName="email"
+                  placeholder="voce@exemplo.com"
+                  autocomplete="email"
+                />
+                @if (hasError('email', 'required')) {
+                  <span class="login-page__error">Informe seu email.</span>
+                }
+                @if (hasError('email', 'email')) {
+                  <span class="login-page__error">Use um email valido.</span>
+                }
+              </div>
+
+              <div class="login-page__field">
+                <label class="login-page__label" for="login-password">Senha</label>
+                <input
+                  id="login-password"
+                  class="login-page__input"
+                  type="password"
+                  formControlName="password"
+                  placeholder="Sua senha"
+                  autocomplete="current-password"
+                />
+                @if (hasError('password', 'required')) {
+                  <span class="login-page__error">Informe sua senha.</span>
+                }
+                @if (hasError('password', 'minlength')) {
+                  <span class="login-page__error">A senha precisa ter pelo menos 8 caracteres.</span>
+                }
+              </div>
+
+              <label class="login-page__checkbox">
+                <input type="checkbox" formControlName="rememberSession" />
+                <span>Manter sessao neste dispositivo</span>
+              </label>
+
+              <button class="login-page__submit" type="submit" [disabled]="isSubmitting()">
+                {{ isSubmitting() ? 'Entrando...' : 'Entrar' }}
+              </button>
+            </form>
+
+            <div class="login-page__footer">
+              <span>Ainda nao tem conta?</span>
+              <a routerLink="/auth/criar-conta">Criar conta</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>
