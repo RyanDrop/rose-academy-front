@@ -14,6 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 import { PasswordStrength } from '../../../../shared/components/password-strength/password-strength';
 import { StepProgress } from '../../../../shared/components/step-progress/step-progress';
 import { AuthHeroCard } from '../../../../widgets/auth-hero-card/auth-hero-card';
+import { NgxMaskDirective } from 'ngx-mask';
 import { PlanSelector } from '../../../../widgets/plan-selector/plan-selector';
 import {
   AuthGoal,
@@ -26,6 +27,7 @@ import {
   birthDateValidator,
   fullNameValidator,
   matchingFieldsValidator,
+  metricRangeValidator,
   optionalPhoneValidator,
   passwordComplexityValidator,
 } from '../../auth.validators';
@@ -41,6 +43,7 @@ import { AuthService } from '../../services/auth';
     PasswordStrength,
     PlanSelector,
     CurrencyPipe,
+    NgxMaskDirective,
   ],
   templateUrl: './register-page.html',
   styleUrl: './register-page.scss',
@@ -85,15 +88,13 @@ export class RegisterPage implements OnInit {
         Validators.required,
         birthDateValidator(12),
       ]),
-      weight: this.formBuilder.control<number | null>(null, [
+      weight: this.formBuilder.control<string>('', [
         Validators.required,
-        Validators.min(30),
-        Validators.max(400),
+        metricRangeValidator(30, 400),
       ]),
-      height: this.formBuilder.control<number | null>(null, [
+      height: this.formBuilder.control<string>('', [
         Validators.required,
-        Validators.min(120),
-        Validators.max(250),
+        metricRangeValidator(120, 250),
       ]),
       goalId: this.formBuilder.control<number | null>(null, [
         Validators.required,
@@ -118,6 +119,13 @@ export class RegisterPage implements OnInit {
   readonly isCreatingAccount = signal(false);
   readonly isSubmittingRegistration = signal(false);
   readonly maxBirthDate = getMaximumBirthDate(12);
+
+  /** 1 a 3 digitos (ex.: 30, 400). */
+  readonly weightHeightMask = '099';
+  readonly weightSuffix = ' kg';
+  readonly heightSuffix = ' cm';
+  /** DDD + fixo 8 ou celular 9 digitos. */
+  readonly phoneMask = '(00) 0000-0000||(00) 00000-0000';
 
   readonly selectedPlan = computed(
     () =>
@@ -333,8 +341,8 @@ export class RegisterPage implements OnInit {
     return {
       gender: profileValue.gender as RegisterProfilePayload['gender'],
       dateBirth: profileValue.dateBirth,
-      weight: Number(profileValue.weight),
-      height: Number(profileValue.height),
+      weight: parseInt(digitsOnly(String(profileValue.weight)), 10) || 0,
+      height: parseInt(digitsOnly(String(profileValue.height)), 10) || 0,
       goalId: Number(profileValue.goalId),
       profileImg: profileValue.profileImg,
       cellphone: profileValue.cellphone

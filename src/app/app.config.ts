@@ -6,7 +6,8 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideNgxMask } from 'ngx-mask';
 
 import { routes } from './app.routes';
 
@@ -16,10 +17,17 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'top',
+        anchorScrolling: 'enabled',
+      }),
+    ),
     {
       provide: LOCALE_ID,
       useValue: 'pt-BR'
-    }
+    },
+    ...provideNgxMask({ validation: false })
   ]
 };

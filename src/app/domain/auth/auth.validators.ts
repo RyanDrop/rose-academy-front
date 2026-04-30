@@ -91,3 +91,26 @@ export function optionalPhoneValidator(): ValidatorFn {
     return /^\d{10,11}$/.test(value) ? null : { invalidPhone: true };
   };
 }
+
+/** Peso, altura, etc. com ngx-mask e sufixo (ex. `85 kg`) — compara pelos digitos. */
+export function metricRangeValidator(min: number, max: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const digits = `${control.value ?? ''}`.replace(/\D/g, '');
+
+    if (!digits) {
+      return null;
+    }
+
+    const n = parseInt(digits, 10);
+
+    if (n < min) {
+      return { min: { min, actual: n } };
+    }
+
+    if (n > max) {
+      return { max: { max, actual: n } };
+    }
+
+    return null;
+  };
+}
