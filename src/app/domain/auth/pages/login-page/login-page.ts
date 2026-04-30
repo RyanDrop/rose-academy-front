@@ -1,8 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   ViewEncapsulation,
-  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -21,7 +21,7 @@ import { AuthService } from '../../services/auth';
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
@@ -29,7 +29,6 @@ export class LoginPage {
   readonly heroMetrics: AuthHeroMetric[] = [
     { label: 'Aulas gravadas', value: '120+' },
     { label: 'Guias praticos', value: '36' },
-    { label: 'Evolucao guiada', value: '7 dias' },
   ];
 
   readonly loginForm = this.formBuilder.nonNullable.group({
@@ -42,15 +41,6 @@ export class LoginPage {
   readonly feedbackMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
   readonly hasStarted = signal(false);
-  readonly dragOffset = signal(0);
-  readonly isDraggingStart = signal(false);
-  private dragStartX = 0;
-  private dragBaseOffset = 0;
-  private dragMax = 220;
-
-  readonly dragProgress = computed(() =>
-    Math.min(this.dragOffset() / this.dragMax, 1),
-  );
 
   constructor() {
     const queryEmail =
@@ -72,48 +62,13 @@ export class LoginPage {
     }
   }
 
+  ngOnInit(): void {
+    this.hasStarted.set(window.innerWidth >= 768);
+  }
+
   beginJourney(): void {
     this.hasStarted.set(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  startDrag(event: PointerEvent): void {
-    const thumb = event.currentTarget as HTMLElement | null;
-    const track = thumb?.parentElement;
-    if (thumb && track) {
-      this.dragMax = Math.max(track.clientWidth - thumb.clientWidth - 16, 0);
-    }
-
-    thumb?.setPointerCapture?.(event.pointerId);
-    this.isDraggingStart.set(true);
-    this.dragStartX = event.clientX;
-    this.dragBaseOffset = this.dragOffset();
-  }
-
-  onDrag(event: PointerEvent): void {
-    if (!this.isDraggingStart()) {
-      return;
-    }
-
-    const nextOffset = this.dragBaseOffset + (event.clientX - this.dragStartX);
-    this.dragOffset.set(clamp(nextOffset, 0, this.dragMax));
-  }
-
-  endDrag(): void {
-    if (!this.isDraggingStart()) {
-      return;
-    }
-
-    this.isDraggingStart.set(false);
-
-    if (this.dragProgress() >= 0.92) {
-      this.dragOffset.set(this.dragMax);
-      this.beginJourney();
-      queueMicrotask(() => this.dragOffset.set(0));
-      return;
-    }
-
-    this.dragOffset.set(0);
   }
 
   submit(): void {
@@ -161,8 +116,4 @@ export class LoginPage {
 
 function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
 }

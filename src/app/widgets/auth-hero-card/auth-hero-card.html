@@ -11,7 +11,7 @@
   </header>
 
   <div class="auth-hero-card__content">
-    <p class="auth-hero-card__eyebrow">Seu treino, sua rotina, sua evolucao</p>
+    <p class="auth-hero-card__eyebrow">Seu treino, sua rotina, sua evolução</p>
     <h2 class="auth-hero-card__title">{{ title() }}</h2>
     <p class="auth-hero-card__subtitle">{{ subtitle() }}</p>
 
@@ -27,15 +27,11 @@
     <div class="auth-hero-card__orbit auth-hero-card__orbit--inner"></div>
     <div class="auth-hero-card__dumbbell auth-hero-card__dumbbell--left"></div>
     <div class="auth-hero-card__dumbbell auth-hero-card__dumbbell--right"></div>
-
-    <div class="auth-hero-card__figure">
-      <div class="auth-hero-card__figure-head"></div>
-      <div class="auth-hero-card__figure-body"></div>
-      <div class="auth-hero-card__figure-arm auth-hero-card__figure-arm--left"></div>
-      <div class="auth-hero-card__figure-arm auth-hero-card__figure-arm--right"></div>
-      <div class="auth-hero-card__figure-leg auth-hero-card__figure-leg--left"></div>
-      <div class="auth-hero-card__figure-leg auth-hero-card__figure-leg--right"></div>
-    </div>
+    <img
+      src="assets/svgs/training.svg"
+      alt="Hero Card"
+      class="auth-hero-card__illustration-image"
+    />
   </div>
 
   <div class="auth-hero-card__metrics">
@@ -46,4 +42,43 @@
       </article>
     }
   </div>
+
+  @if (showStartSlider()) {
+    <div class="auth-hero-card__start">
+      <div
+        class="auth-hero-card__start-track"
+        (pointermove)="onDrag($event)"
+        (pointerup)="endDrag()"
+        (pointercancel)="endDrag()"
+        (pointerleave)="endDrag()"
+      >
+        <div
+          class="auth-hero-card__start-fill"
+          [style.transform]="'scaleX(' + dragProgress() + ')'"
+        ></div>
+
+        <button
+          type="button"
+          class="auth-hero-card__start-thumb"
+          [class.auth-hero-card__start-thumb--dragging]="isDraggingStart()"
+          [style.transform]="'translateX(' + dragOffset() + 'px)'"
+          (pointerdown)="startDrag($event)"
+          (pointerup)="endDrag()"
+        >
+          <span class="auth-hero-card__start-thumb-text">Start</span>
+        </button>
+        <span class="auth-hero-card__start-arrows" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span
+          class="auth-hero-card__start-hint"
+          [style.opacity]="1 - dragProgress()"
+        >
+          {{ startHint() }}
+        </span>
+      </div>
+    </div>
+  }
 </section>

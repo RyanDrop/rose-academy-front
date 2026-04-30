@@ -1,6 +1,8 @@
+import { CurrencyPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   ViewEncapsulation,
   computed,
   inject,
@@ -38,13 +40,14 @@ import { AuthService } from '../../services/auth';
     StepProgress,
     PasswordStrength,
     PlanSelector,
+    CurrencyPipe,
   ],
   templateUrl: './register-page.html',
   styleUrl: './register-page.scss',
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RegisterPage {
+export class RegisterPage implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -55,7 +58,6 @@ export class RegisterPage {
   readonly heroMetrics: AuthHeroMetric[] = [
     { label: 'Treinos semanais', value: '5x' },
     { label: 'Planos de estudo', value: 'PDF + video' },
-    { label: 'Acesso flexivel', value: '24h' },
   ];
 
   readonly registerForm = this.formBuilder.group({
@@ -115,65 +117,21 @@ export class RegisterPage {
   readonly avatarError = signal<string | null>(null);
   readonly isCreatingAccount = signal(false);
   readonly isSubmittingRegistration = signal(false);
-  readonly dragOffset = signal(0);
-  readonly isDraggingStart = signal(false);
   readonly maxBirthDate = getMaximumBirthDate(12);
-  private dragStartX = 0;
-  private dragBaseOffset = 0;
-  private dragMax = 220;
 
   readonly selectedPlan = computed(
     () =>
       this.plans.find((plan) => plan.taxId === this.selectedTaxId()) ?? null,
   );
 
-  readonly dragProgress = computed(() =>
-    Math.min(this.dragOffset() / this.dragMax, 1),
-  );
+  ngOnInit(): void {
+    this.hasStarted.set(window.innerWidth >= 768);
+  }
 
   beginJourney(): void {
     this.hasStarted.set(true);
     this.feedbackMessage.set(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  startDrag(event: PointerEvent): void {
-    const thumb = event.currentTarget as HTMLElement | null;
-    const track = thumb?.parentElement;
-    if (thumb && track) {
-      this.dragMax = Math.max(track.clientWidth - thumb.clientWidth - 16, 0);
-    }
-
-    thumb?.setPointerCapture?.(event.pointerId);
-    this.isDraggingStart.set(true);
-    this.dragStartX = event.clientX;
-    this.dragBaseOffset = this.dragOffset();
-  }
-
-  onDrag(event: PointerEvent): void {
-    if (!this.isDraggingStart()) {
-      return;
-    }
-
-    const nextOffset = this.dragBaseOffset + (event.clientX - this.dragStartX);
-    this.dragOffset.set(clamp(nextOffset, 0, this.dragMax));
-  }
-
-  endDrag(): void {
-    if (!this.isDraggingStart()) {
-      return;
-    }
-
-    this.isDraggingStart.set(false);
-
-    if (this.dragProgress() >= 0.92) {
-      this.dragOffset.set(this.dragMax);
-      this.beginJourney();
-      queueMicrotask(() => this.dragOffset.set(0));
-      return;
-    }
-
-    this.dragOffset.set(0);
   }
 
   continueFromAccount(): void {
@@ -402,8 +360,4 @@ function getMaximumBirthDate(minimumAge: number): string {
   const date = new Date();
   date.setFullYear(date.getFullYear() - minimumAge);
   return date.toISOString().split('T')[0];
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
 }

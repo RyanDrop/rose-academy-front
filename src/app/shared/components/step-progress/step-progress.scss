@@ -5,6 +5,7 @@
 .step-progress {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--ra-space-2);
   overflow-x: auto;
   padding-bottom: var(--ra-space-2);

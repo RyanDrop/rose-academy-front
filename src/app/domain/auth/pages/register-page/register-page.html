@@ -1,5 +1,5 @@
 <section class="register-page">
-  <div class="register-page__shell">
+  <div class="register-page__shell" [class.padding]="hasStarted()">
     @if (!hasStarted()) {
       <div class="register-page__entry">
         <div class="register-page__hero register-page__hero--entry">
@@ -8,43 +8,11 @@
             title="Crie a jornada do aluno."
             subtitle="Cadastro em etapas com dados pessoais, meta, plano e imagem de perfil, tudo validado."
             accentLabel="Onboarding"
-            [badges]="['Conta + perfil', 'Imagem opcional', 'Plano mockado']"
             [metrics]="heroMetrics"
+            [showStartSlider]="true"
+            startHint="Arraste para comecar"
+            (journeyStart)="beginJourney()"
           />
-        </div>
-
-        <div class="register-page__start">
-          <span class="register-page__start-label">Start</span>
-          <div
-            class="register-page__start-track"
-            (pointermove)="onDrag($event)"
-            (pointerup)="endDrag()"
-            (pointercancel)="endDrag()"
-            (pointerleave)="endDrag()"
-          >
-            <div
-              class="register-page__start-fill"
-              [style.transform]="'scaleX(' + dragProgress() + ')'"
-            ></div>
-
-            <button
-              type="button"
-              class="register-page__start-thumb"
-              [class.register-page__start-thumb--dragging]="isDraggingStart()"
-              [style.transform]="'translateX(' + dragOffset() + 'px)'"
-              (pointerdown)="startDrag($event)"
-              (pointerup)="endDrag()"
-            >
-              <span class="register-page__start-thumb-text">Start</span>
-              <span class="register-page__start-arrows" aria-hidden="true">
-                <span></span>
-                <span></span>
-              </span>
-            </button>
-            <span class="register-page__start-hint" [style.opacity]="1 - dragProgress()">
-              Arraste para comecar
-            </span>
-          </div>
         </div>
       </div>
     } @else {
@@ -54,15 +22,20 @@
             <span class="register-page__brand-mark">RA</span>
             <div>
               <span class="register-page__brand-name">Rose Academy</span>
-              <span class="register-page__brand-copy">Cadastro de novos alunos</span>
+              <span class="register-page__brand-copy"
+                >Cadastro de novos alunos</span
+              >
             </div>
           </div>
 
           <div class="register-page__intro">
             <span class="register-page__eyebrow">Criar conta</span>
-            <h1 class="register-page__title">Monte o onboarding em tres passos</h1>
+            <h1 class="register-page__title">
+              Monte o onboarding em tres passos
+            </h1>
             <p class="register-page__subtitle">
-              Primeiro criamos a conta base. Depois completamos o perfil fisico e o plano.
+              Primeiro criamos a conta base. Depois completamos o perfil fisico
+              e o plano.
             </p>
           </div>
         </div>
@@ -73,7 +46,12 @@
           <p class="register-page__status">{{ feedbackMessage() }}</p>
         }
 
-        <form class="register-page__form" [formGroup]="registerForm" (ngSubmit)="submitRegistration()" novalidate>
+        <form
+          class="register-page__form"
+          [formGroup]="registerForm"
+          (ngSubmit)="submitRegistration()"
+          novalidate
+        >
           @if (currentStep() === 1) {
             <section class="register-page__step" formGroupName="account">
               <div class="register-page__step-header">
@@ -82,12 +60,15 @@
                   <h2 class="register-page__step-title">Dados da conta</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Esses dados simulam a criacao inicial do usuario antes do restante do onboarding.
+                  Esses dados simulam a criacao inicial do usuario antes do
+                  restante do onboarding.
                 </p>
               </div>
 
               <div class="register-page__field">
-                <label class="register-page__label" for="register-full-name">Nome completo</label>
+                <label class="register-page__label" for="register-full-name"
+                  >Nome completo</label
+                >
                 <input
                   id="register-full-name"
                   class="register-page__input"
@@ -96,16 +77,22 @@
                   placeholder="Ex.: Ana Maria Souza"
                   autocomplete="name"
                 />
-                @if (hasAccountError('fullName', 'required')) {
-                  <span class="register-page__error">Informe o nome completo.</span>
+                @if (hasAccountError("fullName", "required")) {
+                  <span class="register-page__error"
+                    >Informe o nome completo.</span
+                  >
                 }
-                @if (hasAccountError('fullName', 'fullName')) {
-                  <span class="register-page__error">Use nome e sobrenome.</span>
+                @if (hasAccountError("fullName", "fullName")) {
+                  <span class="register-page__error"
+                    >Use nome e sobrenome.</span
+                  >
                 }
               </div>
 
               <div class="register-page__field">
-                <label class="register-page__label" for="register-email">Email</label>
+                <label class="register-page__label" for="register-email"
+                  >Email</label
+                >
                 <input
                   id="register-email"
                   class="register-page__input"
@@ -114,17 +101,19 @@
                   placeholder="aluno@exemplo.com"
                   autocomplete="email"
                 />
-                @if (hasAccountError('email', 'required')) {
+                @if (hasAccountError("email", "required")) {
                   <span class="register-page__error">Informe o email.</span>
                 }
-                @if (hasAccountError('email', 'email')) {
+                @if (hasAccountError("email", "email")) {
                   <span class="register-page__error">Use um email valido.</span>
                 }
               </div>
 
               <div class="register-page__grid register-page__grid--two">
                 <div class="register-page__field">
-                  <label class="register-page__label" for="register-password">Senha</label>
+                  <label class="register-page__label" for="register-password"
+                    >Senha</label
+                  >
                   <input
                     id="register-password"
                     class="register-page__input"
@@ -133,18 +122,25 @@
                     placeholder="Crie uma senha forte"
                     autocomplete="new-password"
                   />
-                  @if (hasAccountError('password', 'required')) {
+                  @if (hasAccountError("password", "required")) {
                     <span class="register-page__error">Informe uma senha.</span>
                   }
-                  @if (hasAccountError('password', 'minlength') || hasAccountError('password', 'passwordComplexity')) {
+                  @if (
+                    hasAccountError("password", "minlength") ||
+                    hasAccountError("password", "passwordComplexity")
+                  ) {
                     <span class="register-page__error">
-                      Use 8+ caracteres com maiuscula, minuscula, numero e simbolo.
+                      Use 8+ caracteres com maiuscula, minuscula, numero e
+                      simbolo.
                     </span>
                   }
                 </div>
 
                 <div class="register-page__field">
-                  <label class="register-page__label" for="register-confirm-password">
+                  <label
+                    class="register-page__label"
+                    for="register-confirm-password"
+                  >
                     Confirmar senha
                   </label>
                   <input
@@ -155,28 +151,38 @@
                     placeholder="Repita a senha"
                     autocomplete="new-password"
                   />
-                  @if (hasAccountError('confirmPassword', 'required')) {
+                  @if (hasAccountError("confirmPassword", "required")) {
                     <span class="register-page__error">Confirme a senha.</span>
                   }
-                  @if (hasAccountError('confirmPassword', 'fieldsMismatch')) {
-                    <span class="register-page__error">As senhas precisam ser iguais.</span>
+                  @if (hasAccountError("confirmPassword", "fieldsMismatch")) {
+                    <span class="register-page__error"
+                      >As senhas precisam ser iguais.</span
+                    >
                   }
                 </div>
               </div>
 
               <ra-password-strength
-                [password]="registerForm.controls.account.controls.password.value"
+                [password]="
+                  registerForm.controls.account.controls.password.value
+                "
               />
 
               <div class="register-page__actions">
-                <a class="register-page__text-link" routerLink="/auth/login">Ja tenho conta</a>
+                <a class="register-page__text-link" routerLink="/auth/login"
+                  >Ja tenho conta</a
+                >
                 <button
                   class="register-page__submit"
                   type="button"
                   [disabled]="isCreatingAccount()"
                   (click)="continueFromAccount()"
                 >
-                  {{ isCreatingAccount() ? 'Criando conta...' : 'Continuar para o perfil' }}
+                  {{
+                    isCreatingAccount()
+                      ? "Criando conta..."
+                      : "Continuar para o perfil"
+                  }}
                 </button>
               </div>
             </section>
@@ -190,27 +196,40 @@
                   <h2 class="register-page__step-title">Perfil do aluno</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Coletamos informacoes fisicas e objetivo para personalizar aulas e materiais.
+                  Coletamos informações físicas e objetivo para personalizar
+                  aulas e materiais.
                 </p>
               </div>
 
               <div class="register-page__grid register-page__grid--two">
                 <div class="register-page__field">
-                  <label class="register-page__label" for="register-gender">Genero</label>
-                  <select id="register-gender" class="register-page__input" formControlName="gender">
+                  <label class="register-page__label" for="register-gender"
+                    >Gênero</label
+                  >
+                  <select
+                    id="register-gender"
+                    class="register-page__input"
+                    formControlName="gender"
+                  >
                     <option value="">Selecione</option>
                     <option value="female">Feminino</option>
                     <option value="male">Masculino</option>
                     <option value="non-binary">Nao binario</option>
-                    <option value="prefer-not-to-say">Prefiro nao informar</option>
+                    <option value="prefer-not-to-say">
+                      Prefiro nao informar
+                    </option>
                   </select>
-                  @if (hasProfileError('gender', 'required')) {
-                    <span class="register-page__error">Selecione o genero.</span>
+                  @if (hasProfileError("gender", "required")) {
+                    <span class="register-page__error"
+                      >Selecione o gênero.</span
+                    >
                   }
                 </div>
 
                 <div class="register-page__field">
-                  <label class="register-page__label" for="register-birth">Data de nascimento</label>
+                  <label class="register-page__label" for="register-birth"
+                    >Data de nascimento</label
+                  >
                   <input
                     id="register-birth"
                     class="register-page__input"
@@ -218,18 +237,24 @@
                     formControlName="dateBirth"
                     [max]="maxBirthDate"
                   />
-                  @if (hasProfileError('dateBirth', 'required')) {
-                    <span class="register-page__error">Informe a data de nascimento.</span>
+                  @if (hasProfileError("dateBirth", "required")) {
+                    <span class="register-page__error"
+                      >Informe a data de nascimento.</span
+                    >
                   }
-                  @if (hasProfileError('dateBirth', 'minimumAge')) {
-                    <span class="register-page__error">Cadastro liberado para 12 anos ou mais.</span>
+                  @if (hasProfileError("dateBirth", "minimumAge")) {
+                    <span class="register-page__error"
+                      >Cadastro liberado para 12 anos ou mais.</span
+                    >
                   }
                 </div>
               </div>
 
               <div class="register-page__grid register-page__grid--two">
                 <div class="register-page__field">
-                  <label class="register-page__label" for="register-weight">Peso (kg)</label>
+                  <label class="register-page__label" for="register-weight"
+                    >Peso (kg)</label
+                  >
                   <input
                     id="register-weight"
                     class="register-page__input"
@@ -239,16 +264,23 @@
                     max="400"
                     placeholder="Ex.: 68"
                   />
-                  @if (hasProfileError('weight', 'required')) {
+                  @if (hasProfileError("weight", "required")) {
                     <span class="register-page__error">Informe o peso.</span>
                   }
-                  @if (hasProfileError('weight', 'min') || hasProfileError('weight', 'max')) {
-                    <span class="register-page__error">Use um valor entre 30 e 400 kg.</span>
+                  @if (
+                    hasProfileError("weight", "min") ||
+                    hasProfileError("weight", "max")
+                  ) {
+                    <span class="register-page__error"
+                      >Use um valor entre 30 e 400 kg.</span
+                    >
                   }
                 </div>
 
                 <div class="register-page__field">
-                  <label class="register-page__label" for="register-height">Altura (cm)</label>
+                  <label class="register-page__label" for="register-height"
+                    >Altura (cm)</label
+                  >
                   <input
                     id="register-height"
                     class="register-page__input"
@@ -258,25 +290,38 @@
                     max="250"
                     placeholder="Ex.: 170"
                   />
-                  @if (hasProfileError('height', 'required')) {
+                  @if (hasProfileError("height", "required")) {
                     <span class="register-page__error">Informe a altura.</span>
                   }
-                  @if (hasProfileError('height', 'min') || hasProfileError('height', 'max')) {
-                    <span class="register-page__error">Use um valor entre 120 e 250 cm.</span>
+                  @if (
+                    hasProfileError("height", "min") ||
+                    hasProfileError("height", "max")
+                  ) {
+                    <span class="register-page__error"
+                      >Use um valor entre 120 e 250 cm.</span
+                    >
                   }
                 </div>
               </div>
 
               <div class="register-page__grid register-page__grid--two">
                 <div class="register-page__field">
-                  <label class="register-page__label" for="register-goal">Meta</label>
-                  <select id="register-goal" class="register-page__input" formControlName="goalId">
+                  <label class="register-page__label" for="register-goal"
+                    >Meta</label
+                  >
+                  <select
+                    id="register-goal"
+                    class="register-page__input"
+                    formControlName="goalId"
+                  >
                     <option [ngValue]="null">Selecione a meta</option>
                     @for (goal of goals; track goal.id) {
-                      <option [ngValue]="goal.id">{{ goal.label }} - {{ goal.description }}</option>
+                      <option [ngValue]="goal.id">
+                        {{ goal.label }} - {{ goal.description }}
+                      </option>
                     }
                   </select>
-                  @if (hasProfileError('goalId', 'required')) {
+                  @if (hasProfileError("goalId", "required")) {
                     <span class="register-page__error">Selecione a meta.</span>
                   }
                 </div>
@@ -293,8 +338,10 @@
                     placeholder="(00) 00000-0000"
                     autocomplete="tel"
                   />
-                  @if (hasProfileError('cellphone', 'invalidPhone')) {
-                    <span class="register-page__error">Use 10 ou 11 digitos.</span>
+                  @if (hasProfileError("cellphone", "invalidPhone")) {
+                    <span class="register-page__error"
+                      >Use 10 ou 11 digitos.</span
+                    >
                   }
                 </div>
               </div>
@@ -312,7 +359,10 @@
                 <div class="register-page__upload">
                   @if (avatarPreview()) {
                     <div class="register-page__upload-preview">
-                      <img [src]="avatarPreview()!" alt="Preview da imagem de perfil" />
+                      <img
+                        [src]="avatarPreview()!"
+                        alt="Preview da imagem de perfil"
+                      />
                       <div class="register-page__upload-actions">
                         <button
                           class="register-page__upload-button register-page__upload-button--ghost"
@@ -354,8 +404,18 @@
               </div>
 
               <div class="register-page__actions">
-                <button class="register-page__back" type="button" (click)="goBack()">Voltar</button>
-                <button class="register-page__submit" type="button" (click)="continueFromProfile()">
+                <button
+                  class="register-page__back"
+                  type="button"
+                  (click)="goBack()"
+                >
+                  Voltar
+                </button>
+                <button
+                  class="register-page__submit"
+                  type="button"
+                  (click)="continueFromProfile()"
+                >
                   Ir para o plano
                 </button>
               </div>
@@ -370,7 +430,8 @@
                   <h2 class="register-page__step-title">Escolha o plano</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Mock de selecao usando `tax_id`, pronto para ligar no checkout real depois.
+                  Mock de selecao usando `tax_id`, pronto para ligar no checkout
+                  real depois.
                 </p>
               </div>
 
@@ -380,30 +441,54 @@
                 (selectedTaxIdChange)="selectPlan($event)"
               />
 
-              @if (registerForm.controls.plan.controls.taxId.touched && registerForm.controls.plan.controls.taxId.hasError('required')) {
-                <span class="register-page__error">Escolha um plano para concluir o cadastro.</span>
+              @if (
+                registerForm.controls.plan.controls.taxId.touched &&
+                registerForm.controls.plan.controls.taxId.hasError("required")
+              ) {
+                <span class="register-page__error"
+                  >Escolha um plano para concluir o cadastro.</span
+                >
               }
 
               @if (selectedPlan()) {
                 <article class="register-page__summary">
-                  <span class="register-page__summary-label">Plano selecionado</span>
-                  <h3 class="register-page__summary-title">{{ selectedPlan()!.name }}</h3>
-                  <p class="register-page__summary-copy">{{ selectedPlan()!.description }}</p>
+                  <span class="register-page__summary-label"
+                    >Plano selecionado</span
+                  >
+                  <h3 class="register-page__summary-title">
+                    {{ selectedPlan()!.name }}
+                  </h3>
+                  <p class="register-page__summary-copy">
+                    {{ selectedPlan()!.description }}
+                  </p>
                   <div class="register-page__summary-meta">
-                    <span>tax_id: {{ selectedPlan()!.taxId }}</span>
-                    <span>Valor: R$ {{ selectedPlan()!.price }}</span>
+                    <span>Plano: {{ selectedPlan()!.name }}</span>
+                    <span
+                      >Valor:
+                      {{ selectedPlan()!.price | currency: "BRL" }}</span
+                    >
                   </div>
                 </article>
               }
 
               <div class="register-page__actions">
-                <button class="register-page__back" type="button" (click)="goBack()">Voltar</button>
+                <button
+                  class="register-page__back"
+                  type="button"
+                  (click)="goBack()"
+                >
+                  Voltar
+                </button>
                 <button
                   class="register-page__submit"
                   type="submit"
                   [disabled]="isSubmittingRegistration()"
                 >
-                  {{ isSubmittingRegistration() ? 'Finalizando...' : 'Criar conta e concluir' }}
+                  {{
+                    isSubmittingRegistration()
+                      ? "Finalizando..."
+                      : "Criar conta e concluir"
+                  }}
                 </button>
               </div>
             </section>
