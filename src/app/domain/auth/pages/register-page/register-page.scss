@@ -167,11 +167,13 @@
 .register-page__grid {
   display: grid;
   gap: var(--ra-space-4);
+  min-width: 0;
 }
 
 .register-page__field {
   display: grid;
   gap: 0.55rem;
+  min-width: 0;
 }
 
 .register-page__label {
@@ -181,15 +183,60 @@
 
 .register-page__input {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 50px;
   padding: 0 1rem;
   border: 1px solid rgba(16, 24, 32, 0.14);
   border-radius: var(--ra-radius-md);
   background: #fff;
+  color: var(--ra-color-secondary);
+  font-size: 1rem;
+  line-height: 1.35;
+  text-align: start;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
     transform 180ms ease;
+}
+
+select.register-page__input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.75rem;
+  text-align: start;
+  text-align-last: start;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23101820' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  background-size: 1.1rem 1.1rem;
+}
+
+input.register-page__input[type="date"] {
+  text-align: start;
+}
+
+input.register-page__input[type="date"]::-webkit-date-and-time-value {
+  text-align: start;
+}
+
+input.register-page__input[type="date"]::-webkit-datetime-edit,
+input.register-page__input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  width: 100%;
+  text-align: start;
+  margin: 0;
+  padding: 0;
+}
+
+input.register-page__input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input.register-page__input[type="number"]::-webkit-outer-spin-button,
+input.register-page__input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .register-page__input:focus {
