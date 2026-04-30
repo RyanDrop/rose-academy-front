@@ -51,6 +51,7 @@
   font-family: var(--ra-font-heading);
   font-size: 1.1rem;
   font-weight: 700;
+  color: var(--ra-color-secondary);
 }
 
 .plan-selector__description {
@@ -77,6 +78,7 @@
 
 .plan-selector__price {
   margin-top: var(--ra-space-5);
+  color: var(--ra-color-secondary);
 }
 
 .plan-selector__price strong {

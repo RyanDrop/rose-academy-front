@@ -219,14 +219,14 @@ select.register-page__input {
   background-size: 1.1rem 1.1rem;
 }
 
-// iOS / WebKit: o date tem largura mínima do conteúdo; flex + min-width: 0
-// no wrapper evita o campo a saltar fora do ecrã. O input com flex: 1 1 0% encolhe
-// com a coluna.
+// iOS WebKit: date a largura cheia; Safari ignora muitas vezes min-height só.
 .register-page__date-wrap {
   display: flex;
+  align-items: stretch;
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  min-height: 50px;
   border-radius: var(--ra-radius-md);
 }
 
@@ -238,9 +238,16 @@ input.register-page__input--date {
   display: block;
   text-align: start;
   --date-icon-w: 2.25rem;
+  padding-top: 0;
+  padding-bottom: 0;
   padding-left: 1rem;
   padding-right: var(--date-icon-w);
   position: relative;
+  box-sizing: border-box;
+  min-height: 50px;
+  height: 50px;
+  max-height: 50px;
+  line-height: 48px;
 }
 
 // Ícone de calendário: não alargar a caixa; colado à direita do conteúdo
