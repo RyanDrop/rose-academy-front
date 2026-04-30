@@ -10,7 +10,7 @@
             accentLabel="Onboarding"
             [metrics]="heroMetrics"
             [showStartSlider]="true"
-            startHint="Arraste para comecar"
+            startHint="Arraste para começar"
             (journeyStart)="beginJourney()"
           />
         </div>
@@ -34,7 +34,7 @@
               Monte o onboarding em tres passos
             </h1>
             <p class="register-page__subtitle">
-              Primeiro criamos a conta base. Depois completamos o perfil fisico
+              Primeiro criamos a conta base. Depois completamos o perfil físico
               e o plano.
             </p>
           </div>
@@ -60,7 +60,7 @@
                   <h2 class="register-page__step-title">Dados da conta</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Esses dados simulam a criacao inicial do usuario antes do
+                  Esses dados simulam a criação inicial do usuário antes do
                   restante do onboarding.
                 </p>
               </div>
@@ -230,13 +230,15 @@
                   <label class="register-page__label" for="register-birth"
                     >Data de nascimento</label
                   >
-                  <input
-                    id="register-birth"
-                    class="register-page__input"
-                    type="date"
-                    formControlName="dateBirth"
-                    [max]="maxBirthDate"
-                  />
+                  <div class="register-page__date-wrap">
+                    <input
+                      id="register-birth"
+                      class="register-page__input register-page__input--date"
+                      type="date"
+                      formControlName="dateBirth"
+                      [max]="maxBirthDate"
+                    />
+                  </div>
                   @if (hasProfileError("dateBirth", "required")) {
                     <span class="register-page__error"
                       >Informe a data de nascimento.</span

@@ -8,34 +8,34 @@ import {
   LoginPayload,
   PendingRegistration,
   RegisterAccountPayload,
-  RegisterPayload
+  RegisterPayload,
 } from '../auth.models';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly goals: AuthGoal[] = [
     {
       id: 1,
       label: 'Emagrecimento',
-      description: 'Treinos com foco em perda de gordura e constancia.'
+      description: 'Treinos com foco em perda de gordura e constancia.',
     },
     {
       id: 2,
       label: 'Hipertrofia',
-      description: 'Evolucao de massa muscular com periodizacao inteligente.'
+      description: 'Evolucao de massa muscular com periodizacao inteligente.',
     },
     {
       id: 3,
       label: 'Condicionamento',
-      description: 'Mais energia, resistencia e performance no dia a dia.'
+      description: 'Mais energia, resistencia e performance no dia a dia.',
     },
     {
       id: 4,
       label: 'Saude e postura',
-      description: 'Mobilidade, fortalecimento e prevencao de dores.'
-    }
+      description: 'Mobilidade, fortalecimento e prevencao de dores.',
+    },
   ];
 
   private readonly plans: AuthPlan[] = [
@@ -44,17 +44,22 @@ export class AuthService {
       name: 'Mensal',
       price: 54.9,
       billingCycle: 'monthly',
-      description: 'Ideal para comecar e conhecer a metodologia da academia.',
-      perks: ['Aulas gravadas', 'Planos atualizados', 'Suporte via comunidade']
+      description: 'Ideal para começar e conhecer a metodologia da academia.',
+      perks: ['Aulas gravadas', 'Planos atualizados', 'Suporte via comunidade'],
     },
     {
       taxId: 'plan-yearly-49990',
       name: 'Anual',
       price: 499.9,
       billingCycle: 'yearly',
-      description: 'Melhor custo-beneficio para evolucao consistente o ano inteiro.',
-      perks: ['Economia no valor total', 'Prioridade em novidades', 'Acompanhamento prolongado']
-    }
+      description:
+        'Melhor custo-beneficio para evolução consistente o ano inteiro.',
+      perks: [
+        'Economia no valor total',
+        'Prioridade em novidades',
+        'Acompanhamento prolongado',
+      ],
+    },
   ];
 
   private nextMockUserId = 1000;
@@ -76,11 +81,13 @@ export class AuthService {
       userId: 1,
       fullName: this.toDisplayName(firstName),
       email: normalizedEmail,
-      token: 'mock-auth-token'
+      token: 'mock-auth-token',
     }).pipe(delay(700));
   }
 
-  createAccount(payload: RegisterAccountPayload): Observable<PendingRegistration> {
+  createAccount(
+    payload: RegisterAccountPayload,
+  ): Observable<PendingRegistration> {
     const accountId = this.nextMockUserId++;
     const normalizedEmail = payload.email.trim().toLowerCase();
 
@@ -88,7 +95,7 @@ export class AuthService {
 
     return of({
       accountId,
-      email: normalizedEmail
+      email: normalizedEmail,
     }).pipe(delay(800));
   }
 
@@ -101,7 +108,7 @@ export class AuthService {
       userId: this.nextMockUserId++,
       fullName: payload.fullName.trim(),
       email: normalizedEmail,
-      token: `mock-token-${Date.now()}`
+      token: `mock-token-${Date.now()}`,
     }).pipe(delay(900));
   }
 

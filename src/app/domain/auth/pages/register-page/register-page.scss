@@ -41,6 +41,8 @@
 }
 
 .register-page__panel {
+  min-width: 0;
+  max-width: 100%;
   padding: var(--ra-space-4);
   border-radius: var(--ra-radius-lg);
   background: rgba(255, 253, 251, 0.92);
@@ -132,11 +134,15 @@
 
 .register-page__form {
   margin-top: var(--ra-space-6);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .register-page__step {
   display: grid;
   gap: var(--ra-space-5);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .register-page__step-header {
@@ -213,20 +219,68 @@ select.register-page__input {
   background-size: 1.1rem 1.1rem;
 }
 
-input.register-page__input[type="date"] {
-  text-align: start;
-}
-
-input.register-page__input[type="date"]::-webkit-date-and-time-value {
-  text-align: start;
-}
-
-input.register-page__input[type="date"]::-webkit-datetime-edit,
-input.register-page__input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+// iOS / WebKit: o date tem largura mínima do conteúdo; flex + min-width: 0
+// no wrapper evita o campo a saltar fora do ecrã. O input com flex: 1 1 0% encolhe
+// com a coluna.
+.register-page__date-wrap {
+  display: flex;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border-radius: var(--ra-radius-md);
+}
+
+input.register-page__input--date {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  text-align: start;
+  --date-icon-w: 2.25rem;
+  padding-left: 1rem;
+  padding-right: var(--date-icon-w);
+  position: relative;
+}
+
+// Ícone de calendário: não alargar a caixa; colado à direita do conteúdo
+input.register-page__input--date::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+input.register-page__input--date::-webkit-date-and-time-value {
+  text-align: start;
+}
+
+input.register-page__input--date::-webkit-datetime-edit,
+input.register-page__input--date::-webkit-datetime-edit-fields-wrapper {
+  width: 100%;
+  max-width: 100%;
   text-align: start;
   margin: 0;
   padding: 0;
+}
+
+// Campos (dia/mês/ano) para não forçar largura extra
+input.register-page__input--date::-webkit-datetime-edit-year-field,
+input.register-page__input--date::-webkit-datetime-edit-month-field,
+input.register-page__input--date::-webkit-datetime-edit-day-field,
+input.register-page__input--date::-webkit-datetime-edit-text,
+input.register-page__input--date::-webkit-datetime-edit-ampm-field {
+  min-width: 0;
+  padding: 0 0.12rem;
+  text-align: start;
+  color: inherit;
 }
 
 input.register-page__input[type="number"] {
