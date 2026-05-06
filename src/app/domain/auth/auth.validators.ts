@@ -92,6 +92,20 @@ export function optionalPhoneValidator(): ValidatorFn {
   };
 }
 
+/** CPF brasileiro (11 digitos, com ou sem mascara). */
+export function cpfValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const digits = `${control.value ?? ''}`.replace(/\D/g, '');
+    if (!digits) {
+      return null;
+    }
+    if (digits.length < 11) {
+      return { cpfIncomplete: true };
+    }
+    return isValidCpfDigits(digits) ? null : { cpf: true };
+  };
+}
+
 /** Peso, altura, etc. com ngx-mask e sufixo (ex. `85 kg`) — compara pelos digitos. */
 export function metricRangeValidator(min: number, max: number): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -113,4 +127,30 @@ export function metricRangeValidator(min: number, max: number): ValidatorFn {
 
     return null;
   };
+}
+
+function isValidCpfDigits(d: string): boolean {
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) {
+    return false;
+  }
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(d[i]!, 10) * (10 - i);
+  }
+  let rest = (sum * 10) % 11;
+  if (rest === 10 || rest === 11) {
+    rest = 0;
+  }
+  if (rest !== parseInt(d[9]!, 10)) {
+    return false;
+  }
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(d[i]!, 10) * (11 - i);
+  }
+  rest = (sum * 10) % 11;
+  if (rest === 10 || rest === 11) {
+    rest = 0;
+  }
+  return rest === parseInt(d[10]!, 10);
 }

@@ -1,0 +1,143 @@
+<div class="home-page">
+  <header class="home-page__header">
+    <div class="home-page__brand">
+      <span class="home-page__brand-mark">RA</span>
+      <div class="home-page__brand-text">
+        <span class="home-page__brand-name">Rose Academy</span>
+        <span class="home-page__brand-tag">Área do aluno</span>
+      </div>
+    </div>
+    <nav class="home-page__nav" aria-label="Conta">
+      <button type="button" class="home-page__logout" (click)="logout()">
+        Sair
+      </button>
+    </nav>
+  </header>
+
+  <main class="home-page__main">
+    <section class="home-page__hero" aria-labelledby="home-welcome-title">
+      <p class="home-page__eyebrow">Inicio</p>
+      <h1 id="home-welcome-title" class="home-page__title">
+        Olá, {{ displayName() }}
+      </h1>
+      <p class="home-page__lead">
+        @if (isLoadingUser()) {
+          Carregando seu perfil...
+        } @else if (loadError()) {
+          Não foi possível carregar o perfil agora, mas sua sessão está ativa.
+          Os treinos e materiais continuam disponíveis em breve nesta área.
+        } @else {
+          Bem-vinda de volta. Continue de onde parou: aulas, PDFs e desafios
+          estão sendo conectados ao seu painel.
+        }
+      </p>
+    </section>
+
+    <section class="home-trainings" aria-label="Treinos disponiveis">
+      <div class="home-trainings__inner">
+        <header class="home-trainings__intro-head">
+          <h2 class="home-trainings__intro-title">Introdução</h2>
+          <p class="home-trainings__intro-hint">
+            Arraste para o lado e assista tudo antes de começar
+          </p>
+        </header>
+        <div
+          class="home-trainings__rail home-trainings__rail--intro"
+          role="list"
+        >
+          @for (item of introRail; track item.key) {
+            <article
+              class="home-trainings__card home-trainings__card--intro"
+              role="listitem"
+            >
+              <div class="home-trainings__card-visual intro" aria-hidden="true">
+                <img [src]="item.image" [alt]="item.title" />
+              </div>
+              <h3 class="home-trainings__card-title">{{ item.title }}</h3>
+              <p class="home-trainings__card-line">{{ item.line }}</p>
+            </article>
+          }
+        </div>
+
+        @if (trainingPlansLoading()) {
+          <p class="home-trainings__status">Carregando treinos...</p>
+        } @else if (trainingPlansError()) {
+          <p class="home-trainings__status home-trainings__status--error">
+            Não foi possível carregar os planos agora.
+            <button
+              type="button"
+              class="home-trainings__retry"
+              (click)="retryTrainingPlans()"
+            >
+              Tentar de novo
+            </button>
+          </p>
+        } @else if (trainingPlans().length === 0) {
+          <p class="home-trainings__status">
+            Nenhum plano de treino ativo no momento. Volte em breve.
+          </p>
+        }
+
+        @for (plan of trainingPlans(); track plan.id) {
+          <div class="home-trainings__block">
+            <header class="home-trainings__block-head">
+              <h2 class="home-trainings__block-title">{{ plan.title }}</h2>
+
+              <span class="home-trainings__level">{{ plan.level }}</span>
+
+              <p class="home-trainings__block-sub">{{ plan.subtitle }}</p>
+            </header>
+            <div class="home-trainings__rail" role="list">
+              @for (month of plan.months; track month.id) {
+                <a
+                  class="home-trainings__card home-trainings__card--month"
+                  role="listitem"
+                  [routerLink]="['/home']"
+                  [queryParams]="{ planId: plan.id, monthId: month.id }"
+                >
+                  <div
+                    class="home-trainings__card-visual month"
+                    aria-hidden="true"
+                  >
+                    <img [src]="imgByPlanId(plan.id)" [alt]="month.title" />
+                  </div>
+                  <h3 class="home-trainings__card-title">{{ month.title }}</h3>
+                  @if (month.subtitle) {
+                    <p class="home-trainings__card-line">
+                      {{ month.subtitle }}
+                    </p>
+                  }
+                  <span class="home-trainings__badge">{{
+                    monthBadgeLabel(month.month_number)
+                  }}</span>
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="home-page__grid" aria-label="Atalhos">
+      <article class="home-page__card">
+        <h2 class="home-page__card-title">Materiais</h2>
+        <p class="home-page__card-copy">
+          PDFs, guias e desafios para acompanhar sua evolução.
+        </p>
+        <span class="home-page__card-badge">Em breve</span>
+      </article>
+      <article class="home-page__card">
+        <h2 class="home-page__card-title">Conta</h2>
+        <p class="home-page__card-copy">
+          Ajuste dados pessoais e preferências quando o painel estiver pronto.
+        </p>
+        <span class="home-page__card-badge">Em breve</span>
+      </article>
+    </section>
+
+    <p class="home-page__hint">
+      Precisa de outra conta?
+      <a routerLink="/auth/criar-conta">Criar conta</a>
+    </p>
+  </main>
+</div>

@@ -1,5 +1,10 @@
+import type { GenderType } from './auth.types';
+
+export type { GenderType } from './auth.types';
+
 export interface AuthGoal {
-  id: number;
+  /** UUID ou identificador retornado pela API. */
+  id: string;
   label: string;
   description: string;
 }
@@ -25,16 +30,19 @@ export interface LoginPayload {
 
 export interface RegisterAccountPayload {
   fullName: string;
+  /** CPF somente digitos (11). */
+  cpf: string;
   email: string;
   password: string;
 }
 
 export interface RegisterProfilePayload {
-  gender: 'female' | 'male' | 'non-binary' | 'prefer-not-to-say';
+  gender: GenderType;
   dateBirth: string;
   weight: number;
   height: number;
-  goalId: number;
+  /** UUID da meta (GET /goals). */
+  goalId: string;
   profileImg: string | null;
   cellphone: string | null;
 }

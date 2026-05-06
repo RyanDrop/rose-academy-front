@@ -31,11 +31,11 @@
           <div class="register-page__intro">
             <span class="register-page__eyebrow">Criar conta</span>
             <h1 class="register-page__title">
-              Monte o onboarding em tres passos
+              Monte o onboarding em três passos
             </h1>
             <p class="register-page__subtitle">
-              Primeiro criamos a conta base. Depois completamos o perfil físico
-              e o plano.
+              Conta na API, perfil com PATCH /auth/me, metas e planos do
+              catalogo, checkout Abacate Pay no final.
             </p>
           </div>
         </div>
@@ -60,8 +60,8 @@
                   <h2 class="register-page__step-title">Dados da conta</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Esses dados simulam a criação inicial do usuário antes do
-                  restante do onboarding.
+                  Enviamos nome, CPF, email e senha para POST /auth/register e
+                  recebemos o JWT da sessao.
                 </p>
               </div>
 
@@ -86,6 +86,34 @@
                   <span class="register-page__error"
                     >Use nome e sobrenome.</span
                   >
+                }
+              </div>
+
+              <div class="register-page__field">
+                <label class="register-page__label" for="register-cpf"
+                  >CPF</label
+                >
+                <input
+                  id="register-cpf"
+                  class="register-page__input"
+                  type="text"
+                  inputmode="numeric"
+                  formControlName="cpf"
+                  [mask]="cpfMask"
+                  [dropSpecialCharacters]="true"
+                  placeholder="000.000.000-00"
+                  autocomplete="off"
+                />
+                @if (hasAccountError("cpf", "required")) {
+                  <span class="register-page__error">Informe o CPF.</span>
+                }
+                @if (hasAccountError("cpf", "cpfIncomplete")) {
+                  <span class="register-page__error"
+                    >O CPF precisa ter 11 digitos.</span
+                  >
+                }
+                @if (hasAccountError("cpf", "cpf")) {
+                  <span class="register-page__error">CPF invalido.</span>
                 }
               </div>
 
@@ -196,8 +224,8 @@
                   <h2 class="register-page__step-title">Perfil do aluno</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Coletamos informações físicas e objetivo para personalizar
-                  aulas e materiais.
+                  Metas vêm de GET /goals. Ao avançar, PATCH /auth/me grava o
+                  perfil e carregamos GET /products para o proximo passo.
                 </p>
               </div>
 
@@ -212,10 +240,10 @@
                     formControlName="gender"
                   >
                     <option value="">Selecione</option>
-                    <option value="female">Feminino</option>
-                    <option value="male">Masculino</option>
-                    <option value="non-binary">Nao binario</option>
-                    <option value="prefer-not-to-say">
+                    <option value="feminino">Feminino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="outro">Outro</option>
+                    <option value="prefiro_nao_dizer">
                       Prefiro nao informar
                     </option>
                   </select>
@@ -319,11 +347,21 @@
                     id="register-goal"
                     class="register-page__input"
                     formControlName="goalId"
+                    [disabled]="isLoadingGoals()"
                   >
-                    <option [ngValue]="null">Selecione a meta</option>
-                    @for (goal of goals; track goal.id) {
+                    <option [ngValue]="null">
+                      {{
+                        isLoadingGoals()
+                          ? "Carregando metas..."
+                          : "Selecione a meta"
+                      }}
+                    </option>
+                    @for (goal of goals(); track goal.id) {
                       <option [ngValue]="goal.id">
-                        {{ goal.label }} - {{ goal.description }}
+                        {{ goal.label }}
+                        @if (goal.description) {
+                          — {{ goal.description }}
+                        }
                       </option>
                     }
                   </select>
@@ -422,9 +460,14 @@
                 <button
                   class="register-page__submit"
                   type="button"
+                  [disabled]="isSavingProfile()"
                   (click)="continueFromProfile()"
                 >
-                  Ir para o plano
+                  {{
+                    isSavingProfile()
+                      ? "Salvando perfil e carregando planos..."
+                      : "Ir para o plano"
+                  }}
                 </button>
               </div>
             </section>
@@ -438,13 +481,23 @@
                   <h2 class="register-page__step-title">Escolha o plano</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Mock de selecao usando `tax_id`, pronto para ligar no checkout
-                  real depois.
+                  Planos de GET /products. Ao concluir, POST
+                  /abacate/subscriptions/checkout abre o pagamento quando a API
+                  retornar URL.
                 </p>
               </div>
 
+              @if (isLoadingPlans()) {
+                <p class="register-page__status">Carregando planos...</p>
+              } @else if (plans().length === 0) {
+                <p class="register-page__status">
+                  Nenhum plano listado ainda. Volte um passo ou tente mais
+                  tarde.
+                </p>
+              }
+
               <ra-plan-selector
-                [plans]="plans"
+                [plans]="plans()"
                 [selectedTaxId]="selectedTaxId()"
                 (selectedTaxIdChange)="selectPlan($event)"
               />
@@ -490,12 +543,14 @@
                 <button
                   class="register-page__submit"
                   type="submit"
-                  [disabled]="isSubmittingRegistration()"
+                  [disabled]="isSubmittingRegistration() || isLoadingPlans()"
                 >
                   {{
                     isSubmittingRegistration()
-                      ? "Finalizando..."
-                      : "Criar conta e concluir"
+                      ? "Redirecionando para pagamento..."
+                      : isLoadingPlans()
+                        ? "Carregando planos..."
+                        : "Ir para o checkout"
                   }}
                 </button>
               </div>

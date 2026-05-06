@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,11 +8,20 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { AuthHeroCard } from '../../../../widgets/auth-hero-card/auth-hero-card';
+import {
+  AuthApiService,
+  parseSubscriptionActiveStatus,
+  pickPendingAbacatePaymentUrl,
+  tokenFromAuthResponse,
+} from '../../api/auth-api.service';
 import { AuthHeroMetric } from '../../auth.models';
-import { AuthService } from '../../services/auth';
+import { postLoginDestination } from '../../user-onboarding-status';
+import { AuthTokenStorageService } from '../../services/auth-token-storage.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'ra-login-page',
@@ -24,7 +34,10 @@ import { AuthService } from '../../services/auth';
 export class LoginPage implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly authApi = inject(AuthApiService);
+  private readonly authTokenStorage = inject(AuthTokenStorageService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly heroMetrics: AuthHeroMetric[] = [
     { label: 'Aulas gravadas', value: '120+' },
@@ -83,22 +96,65 @@ export class LoginPage implements OnInit {
     this.feedbackMessage.set(null);
     this.successMessage.set(null);
 
-    this.authService
-      .login({
-        email: normalizeEmail(this.loginForm.controls.email.value),
-        password: this.loginForm.controls.password.value.trim(),
-      })
+    const email = normalizeEmail(this.loginForm.controls.email.value);
+    const password = this.loginForm.controls.password.value.trim();
+    const rememberSession = this.loginForm.controls.rememberSession.value;
+
+    this.authApi
+      .login({ email, password })
+      .pipe(
+        switchMap((res) => {
+          const token = tokenFromAuthResponse(res);
+          this.authTokenStorage.setToken(token, rememberSession);
+          return forkJoin({
+            profile: this.authApi.getMe(token).pipe(catchError(() => of(null))),
+            active: this.authApi.getMyActiveSubscription().pipe(
+              catchError(() => of(null)),
+            ),
+          });
+        }),
+      )
       .subscribe({
-        next: (session) => {
-          this.successMessage.set(
-            `Bem-vinda, ${session.fullName}. O dashboard sera conectado assim que os endpoints forem integrados.`,
-          );
+        next: ({ profile, active }) => {
+          if (profile) {
+            this.authTokenStorage.setCachedMe(profile);
+          }
+          const subStatus = parseSubscriptionActiveStatus(active);
+          const dest = postLoginDestination(profile, subStatus);
+          if (dest.kind === 'pending_checkout') {
+            this.authApi
+              .listAbacateSubscriptions()
+              .pipe(
+                map((body) => pickPendingAbacatePaymentUrl(body)),
+                catchError(() => of(null)),
+              )
+              .subscribe((payUrl) => {
+                this.isSubmitting.set(false);
+                if (payUrl) {
+                  window.location.assign(payUrl);
+                  return;
+                }
+                const fallback = postLoginDestination(profile, null);
+                if (fallback.kind === 'route') {
+                  void this.router.navigate(fallback.path, {
+                    queryParams: fallback.queryParams,
+                  });
+                }
+              });
+            return;
+          }
           this.isSubmitting.set(false);
+          if (dest.queryParams) {
+            void this.router.navigate(dest.path, {
+              queryParams: dest.queryParams,
+            });
+          } else {
+            void this.router.navigate(dest.path);
+          }
         },
-        error: () => {
-          this.feedbackMessage.set(
-            'Nao foi possivel entrar. Tente novamente em instantes.',
-          );
+        error: (err: unknown) => {
+          this.authTokenStorage.clear();
+          this.feedbackMessage.set(loginErrorMessage(err));
           this.isSubmitting.set(false);
         },
       });
@@ -116,4 +172,16 @@ export class LoginPage implements OnInit {
 
 function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
+}
+
+function loginErrorMessage(err: unknown): string {
+  if (err instanceof HttpErrorResponse) {
+    if (err.status === 401) {
+      return 'Email ou senha incorretos.';
+    }
+    if (err.status === 400) {
+      return 'Revise email e senha e tente novamente.';
+    }
+  }
+  return 'Nao foi possivel entrar. Tente novamente em instantes.';
 }

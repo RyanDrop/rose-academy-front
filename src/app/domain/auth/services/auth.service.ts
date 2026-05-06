@@ -17,22 +17,22 @@ import {
 export class AuthService {
   private readonly goals: AuthGoal[] = [
     {
-      id: 1,
+      id: '1',
       label: 'Emagrecimento',
       description: 'Treinos com foco em perda de gordura e constancia.',
     },
     {
-      id: 2,
+      id: '2',
       label: 'Hipertrofia',
       description: 'Evolucao de massa muscular com periodizacao inteligente.',
     },
     {
-      id: 3,
+      id: '3',
       label: 'Condicionamento',
       description: 'Mais energia, resistencia e performance no dia a dia.',
     },
     {
-      id: 4,
+      id: '4',
       label: 'Saude e postura',
       description: 'Mobilidade, fortalecimento e prevencao de dores.',
     },
