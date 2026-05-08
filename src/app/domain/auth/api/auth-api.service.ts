@@ -3,16 +3,13 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment.dev';
-
 import type { GenderType } from '../auth.types';
 
-/** Corpo de `POST /auth/login` (controllers.LoginRequest). */
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
-/** Resposta de login/cadastro com JWT (controllers.AuthTokenResponse). */
 export interface AuthTokenResponse {
   token?: string;
   access_token?: string;
@@ -26,7 +23,6 @@ export function tokenFromAuthResponse(res: AuthTokenResponse): string {
   return value.trim();
 }
 
-/** Normaliza o corpo de `/subscriptions/active` para o union usado no front. */
 export function parseSubscriptionActiveStatus(
   body: unknown,
 ): SubscriptionActiveApiStatus {
@@ -47,9 +43,6 @@ export function parseSubscriptionActiveStatus(
   return null;
 }
 
-/**
- * Escolhe checkout pendente em `GET /abacate/subscriptions` e devolve URL de pagamento.
- */
 export function pickPendingAbacatePaymentUrl(body: unknown): string | null {
   for (const row of abacateSubscriptionsToRows(body)) {
     if (!isPendingSubscriptionRow(row)) {
@@ -126,7 +119,6 @@ function extractPaymentLikeUrl(row: Record<string, unknown>): string | null {
   return null;
 }
 
-/** Corpo de `POST /auth/register` (controllers.RegisterRequest). */
 export interface RegisterRequest {
   fullName: string;
   email: string;
@@ -140,8 +132,6 @@ export interface RegisterRequest {
   cellphone: string | null;
   taxId: string;
 }
-
-/** JSON de PATCH /auth/me (snake_case). */
 export interface PatchMeBody {
   gender: GenderType;
   cellphone: string;
@@ -153,14 +143,12 @@ export interface PatchMeBody {
   weight: number;
 }
 
-/** Resposta de `GET /subscriptions/active` (prioridade PAID > PENDING > null). */
 export type SubscriptionActiveApiStatus = 'PAID' | 'PENDING' | null;
 
 export interface ActiveSubscriptionResponse {
   status: SubscriptionActiveApiStatus;
 }
 
-/** Usuário retornado por `GET/PATCH /auth/me` (models.User). */
 export interface ApiUser {
   id: number;
   email: string;
@@ -173,7 +161,6 @@ export interface ApiUser {
   [key: string]: unknown;
 }
 
-/** Item de `GET /goals` (models.Goal). `id` costuma ser UUID. */
 export interface ApiGoal {
   id?: string | number;
   goal_id?: string;
@@ -183,7 +170,6 @@ export interface ApiGoal {
   [key: string]: unknown;
 }
 
-/** JSON de POST /auth/register (snake_case). */
 export interface RegisterAccountApiRequest {
   email: string;
   full_name: string;
@@ -191,8 +177,6 @@ export interface RegisterAccountApiRequest {
   /** CPF (11 digitos). */
   tax_id: string;
 }
-
-/** Item de `GET /products` (models.Product). */
 export interface ApiProduct {
   id?: number | string;
   name?: string;
@@ -229,16 +213,27 @@ export class AuthApiService {
   private readonly baseUrl = environment.apiUrl.replace(/\/$/, '');
 
   login(body: LoginRequest): Observable<AuthTokenResponse> {
-    return this.http.post<AuthTokenResponse>(`${this.baseUrl}/auth/login`, body);
+    return this.http.post<AuthTokenResponse>(
+      `${this.baseUrl}/auth/login`,
+      body,
+    );
   }
 
   register(body: RegisterRequest): Observable<AuthTokenResponse> {
-    return this.http.post<AuthTokenResponse>(`${this.baseUrl}/auth/register`, body);
+    return this.http.post<AuthTokenResponse>(
+      `${this.baseUrl}/auth/register`,
+      body,
+    );
   }
 
   /** Cadastro passo 1 — envia só conta; JWT esperado na resposta. */
-  registerAccount(body: RegisterAccountApiRequest): Observable<AuthTokenResponse> {
-    return this.http.post<AuthTokenResponse>(`${this.baseUrl}/auth/register`, body);
+  registerAccount(
+    body: RegisterAccountApiRequest,
+  ): Observable<AuthTokenResponse> {
+    return this.http.post<AuthTokenResponse>(
+      `${this.baseUrl}/auth/register`,
+      body,
+    );
   }
 
   getMe(accessToken: string): Observable<ApiUser> {
@@ -253,7 +248,6 @@ export class AuthApiService {
     });
   }
 
-  /** PATCH /auth/me com Bearer do interceptor. */
   patchMyProfile(body: PatchMeBody): Observable<ApiUser> {
     return this.http.patch<ApiUser>(`${this.baseUrl}/auth/me`, body);
   }
@@ -266,14 +260,12 @@ export class AuthApiService {
     return this.http.get<ApiProduct[]>(`${this.baseUrl}/products`);
   }
 
-  /** Bearer via interceptor. */
   getMyActiveSubscription(): Observable<ActiveSubscriptionResponse> {
     return this.http.get<ActiveSubscriptionResponse>(
       `${this.baseUrl}/subscriptions/active`,
     );
   }
 
-  /** Lista assinaturas Abacate (checkout pendente, etc.). Bearer via interceptor. */
   listAbacateSubscriptions(): Observable<unknown> {
     return this.http.get<unknown>(`${this.baseUrl}/abacate/subscriptions`);
   }
