@@ -1,0 +1,32 @@
+# Dependencies (installed in the image)
+node_modules
+
+# Build output (built in the image)
+dist
+
+# Version control
+.git
+.gitignore
+
+# Angular cache
+.angular
+
+# IDE / OS
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Tests & coverage (not needed for production build context)
+coverage
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker (avoid nested context issues)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
