@@ -19,7 +19,7 @@ import { AuthHeroMetric } from '../../domain/auth/auth.models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthHeroCard {
-  readonly eyebrow = input('Rose Academy');
+  readonly eyebrow = input('Rosi Nascimento Personal');
   readonly title = input.required<string>();
   readonly subtitle = input.required<string>();
   readonly badges = input<string[]>([]);
