@@ -1,0 +1,395 @@
+<div class="month-detail">
+  <header class="month-detail__topbar">
+    <a
+      routerLink="/treinos"
+      class="month-detail__back"
+      aria-label="Voltar ao plano de treinos"
+      ><mat-icon aria-hidden="true">arrow_back</mat-icon></a>
+    <h1 class="month-detail__title">{{ monthDetailTopTitle() }}</h1>
+    <span class="month-detail__topbar-spacer" aria-hidden="true"></span>
+  </header>
+
+  <main class="month-detail__main">
+    @if (isLoading()) {
+      <p class="month-detail__status">Carregando treinos do mês...</p>
+    } @else if (loadError()) {
+      <div class="month-detail__status month-detail__status--error">
+        <p>{{ loadError() }}</p>
+        <button
+          type="button"
+          class="month-detail__btn"
+          (click)="retry()"
+        >
+          Tentar de novo
+        </button>
+      </div>
+    } @else {
+      <section class="month-detail__workouts" aria-label="Treinos da semana">
+        <header class="month-detail__section-head">
+          <h2>Treinos da semana</h2>
+          <p class="month-detail__section-sub">
+            Toque em um dia para abrir o treino completo.
+          </p>
+        </header>
+
+        @if (workouts().length === 0) {
+          <p class="month-detail__status">
+            Nenhum treino disponível neste mês.
+          </p>
+        } @else {
+          <ul class="month-detail__workouts-list">
+            @for (w of workouts(); track w.workout_id) {
+              <li
+                class="month-detail__workout-card"
+                (click)="goToWorkout(w)"
+                role="button"
+                tabindex="0"
+                (keydown.enter)="goToWorkout(w)"
+              >
+                <div class="month-detail__workout-day">
+                  <span class="month-detail__day-number">D{{ w.day_number }}</span>
+                  <span class="month-detail__day-name">{{ w.day_name }}</span>
+                </div>
+                <div class="month-detail__workout-info">
+                  <h3 class="month-detail__workout-title">{{ w.title }}</h3>
+                  <p class="month-detail__workout-meta">
+                    {{ w.total_exercises }} exercício(s)
+                  </p>
+                </div>
+                <span class="month-detail__workout-arrow" aria-hidden="true">
+                  &rarr;
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="month-detail__reports" aria-label="Relatórios do mês">
+        <header class="month-detail__section-head">
+          <h2>Relatórios do mês</h2>
+          <p class="month-detail__section-sub">
+            @if (isLoadingReports()) {
+              Atualizando dados...
+            } @else if (!hasAnyReport()) {
+              Sem dados de progresso ainda. Conclua um treino para preencher.
+            } @else {
+              Acompanhe estatísticas e progressão de cargas.
+            }
+          </p>
+        </header>
+
+        <div class="month-detail__tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="reportsTab() === 'stats'"
+            class="month-detail__tab"
+            [class.is-active]="reportsTab() === 'stats'"
+            (click)="switchTab('stats')"
+          >
+            Estatísticas
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="reportsTab() === 'weight'"
+            class="month-detail__tab"
+            [class.is-active]="reportsTab() === 'weight'"
+            (click)="switchTab('weight')"
+          >
+            Cargas
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="reportsTab() === 'weekly'"
+            class="month-detail__tab"
+            [class.is-active]="reportsTab() === 'weekly'"
+            (click)="switchTab('weekly')"
+          >
+            Desempenho semanal
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="reportsTab() === 'progression'"
+            class="month-detail__tab"
+            [class.is-active]="reportsTab() === 'progression'"
+            (click)="switchTab('progression')"
+          >
+            Progressão
+          </button>
+        </div>
+
+        <div class="month-detail__tab-panel">
+          @switch (reportsTab()) {
+            @case ('stats') {
+              @if (stats(); as s) {
+                <div class="month-detail__stats">
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Treinos concluídos</span>
+                    <span class="month-detail__stat-value">
+                      {{ s.total_workouts_completed ?? s.completed_workouts ?? 0 }}
+                    </span>
+                  </div>
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Exercícios concluídos</span>
+                    <span class="month-detail__stat-value">
+                      {{ s.total_exercises_completed ?? 0 }}
+                    </span>
+                  </div>
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Séries concluídas</span>
+                    <span class="month-detail__stat-value">
+                      {{ s.total_sets_completed ?? s.total_sets ?? 0 }}
+                    </span>
+                  </div>
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Semanas concluídas</span>
+                    <span class="month-detail__stat-value">
+                      {{ s.weeks_completed ?? 0 }}
+                    </span>
+                  </div>
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Conclusão do mês</span>
+                    <span class="month-detail__stat-value">
+                      {{ completionPercentageDisplay() }}%
+                    </span>
+                  </div>
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Carga média (kg)</span>
+                    <span class="month-detail__stat-value">
+                      {{ (s.average_weight ?? 0) | number: '1.0-2' }}
+                    </span>
+                  </div>
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Carga máxima (kg)</span>
+                    <span class="month-detail__stat-value">
+                      {{ (s.max_weight ?? 0) | number: '1.0-0' }}
+                    </span>
+                  </div>
+                  <div class="month-detail__stat">
+                    <span class="month-detail__stat-label">Volume total (kg)</span>
+                    <span class="month-detail__stat-value">
+                      {{
+                        (s.total_volume ?? s.total_volume_kg ?? 0)
+                          | number: '1.0-2'
+                      }}
+                    </span>
+                  </div>
+                </div>
+              } @else {
+                <p class="month-detail__status">Nenhuma estatística ainda.</p>
+              }
+            }
+
+            @case ('weight') {
+              @if (weight().length === 0) {
+                <p class="month-detail__status">
+                  Sem registros de carga para este mês.
+                </p>
+              } @else if (!weightChartHasData()) {
+                <p class="month-detail__status">
+                  Nenhum ponto com carga e data para montar o gráfico.
+                </p>
+              } @else {
+                <div class="month-detail__chart-blocks">
+                  <p class="month-detail__chart-hint month-detail__chart-hint--lead">
+                    Um gráfico por exercício: eixo X mostra a série de cada
+                    registro; pontos seguem a ordem da data (mais antiga
+                    primeiro).
+                  </p>
+                  @for (block of weightChartBlocks(); track block.exerciseName) {
+                    <div class="month-detail__chart-wrap month-detail__chart-wrap--per-exercise">
+                      <h4 class="month-detail__chart-title">
+                        {{ block.exerciseName }}
+                      </h4>
+                      <ngx-charts-line-chart
+                        [view]="chartView()"
+                        [scheme]="$any(chartColorScheme)"
+                        [results]="block.results"
+                        [legend]="false"
+                        [xAxis]="true"
+                        [yAxis]="true"
+                        [showXAxisLabel]="true"
+                        [showYAxisLabel]="true"
+                        xAxisLabel="Série"
+                        yAxisLabel="Carga (kg)"
+                        [timeline]="false"
+                        [autoScale]="true"
+                        [gradient]="false"
+                        [animations]="true"
+                      />
+                    </div>
+                  }
+                </div>
+              }
+            }
+
+            @case ('weekly') {
+              @if (weekly().length === 0) {
+                <p class="month-detail__status">
+                  Sem desempenho semanal registrado.
+                </p>
+              } @else {
+                <div class="month-detail__table-wrap">
+                  <table class="month-detail__table month-detail__table--wide">
+                    <thead>
+                      <tr>
+                        <th>Exercício</th>
+                        <th>Sem.</th>
+                        <th>Carga máx.</th>
+                        <th>Carga méd.</th>
+                        <th>Séries</th>
+                        <th>Reps méd.</th>
+                        <th>Último treino</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (
+                        row of weekly();
+                        track row.exercise_id || $index
+                      ) {
+                        <tr>
+                          <td>
+                            <div class="month-detail__cell-title">
+                              {{ row.exercise_name || '-' }}
+                            </div>
+                            @if (row.target_muscle || row.equipment) {
+                              <div class="month-detail__cell-meta">
+                                {{ row.target_muscle || '' }}
+                                @if (row.target_muscle && row.equipment) {
+                                  <span aria-hidden="true"> · </span>
+                                }
+                                {{ row.equipment || '' }}
+                              </div>
+                            }
+                          </td>
+                          <td>{{ row.week_number ?? '-' }}</td>
+                          <td>
+                            {{
+                              (row.max_weight ?? row.best_weight ?? 0)
+                                | number: '1.0-1'
+                            }}
+                          </td>
+                          <td>
+                            {{ (row.avg_weight ?? 0) | number: '1.0-2' }}
+                          </td>
+                          <td>{{ row.total_sets ?? '-' }}</td>
+                          <td>
+                            {{ (row.avg_reps ?? row.best_reps ?? 0) | number: '1.0-1' }}
+                          </td>
+                          <td>
+                            @if (row.last_completed) {
+                              {{
+                                row.last_completed
+                                  | date: 'dd/MM/yyyy HH:mm' : undefined : 'pt-BR'
+                              }}
+                            } @else {
+                              -
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            }
+
+            @case ('progression') {
+              @if (progression().length === 0) {
+                <p class="month-detail__status">
+                  Sem dados de progressão ainda.
+                </p>
+              } @else {
+                <div class="month-detail__table-wrap">
+                  <table class="month-detail__table month-detail__table--wide">
+                    <thead>
+                      <tr>
+                        <th>Exercício</th>
+                        <th>Sem. 1 (kg)</th>
+                        <th>Inicial</th>
+                        <th>Final</th>
+                        <th>Ganho (kg)</th>
+                        <th>Ganho %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (
+                        row of progression();
+                        track row.exercise_name || $index
+                      ) {
+                        <tr>
+                          <td>
+                            <div class="month-detail__cell-title">
+                              {{ row.exercise_name || '-' }}
+                            </div>
+                            @if (row.target_muscle || row.equipment) {
+                              <div class="month-detail__cell-meta">
+                                {{ row.target_muscle || '' }}
+                                @if (row.target_muscle && row.equipment) {
+                                  <span aria-hidden="true"> · </span>
+                                }
+                                {{ row.equipment || '' }}
+                              </div>
+                            }
+                          </td>
+                          <td>
+                            {{ (row.week1_weight ?? 0) | number: '1.0-1' }}
+                          </td>
+                          <td>
+                            {{ (row.initial_weight ?? 0) | number: '1.0-1' }}
+                          </td>
+                          <td>
+                            {{ (row.final_weight ?? 0) | number: '1.0-1' }}
+                          </td>
+                          <td>
+                            {{ (row.weight_gain ?? 0) | number: '1.0-2' }}
+                          </td>
+                          <td>
+                            {{ (row.percentage_gain ?? 0) | number: '1.0-1' }}%
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            }
+          }
+        </div>
+      </section>
+
+      <section class="month-detail__danger" aria-label="Reset do mês">
+        <header class="month-detail__section-head">
+          <h2>Recomeçar mês</h2>
+          <p class="month-detail__section-sub">
+            Apaga conclusões e séries deste mês e zera o progresso.
+          </p>
+        </header>
+
+        @if (resetError()) {
+          <p class="month-detail__inline-error">{{ resetError() }}</p>
+        }
+        @if (resetSuccess()) {
+          <p class="month-detail__inline-ok">Progresso do mês resetado.</p>
+        }
+
+        <button
+          type="button"
+          class="month-detail__btn month-detail__btn--danger"
+          [disabled]="isResetting()"
+          (click)="resetProgress()"
+        >
+          @if (isResetting()) {
+            Resetando...
+          } @else {
+            Resetar progresso do mês
+          }
+        </button>
+      </section>
+    }
+  </main>
+</div>

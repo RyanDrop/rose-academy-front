@@ -1,0 +1,176 @@
+<div class="training-plan">
+  <header class="training-plan__topbar">
+    <a
+      routerLink="/home"
+      class="training-plan__back"
+      aria-label="Voltar para o início"
+      ><mat-icon aria-hidden="true">arrow_back</mat-icon></a>
+    <h1 class="training-plan__title">
+      @if (hasPlan()) {
+        Meus treinos ({{ niceLevel(plan()?.level || '') }})
+      } @else {
+        Meus treinos
+      }
+    </h1>
+    <span class="training-plan__topbar-spacer" aria-hidden="true"></span>
+  </header>
+  <main class="training-plan__main">
+    @if (isLoading()) {
+      <p class="training-plan__status">Carregando seu plano...</p>
+    } @else if (loadError()) {
+      <div class="training-plan__status training-plan__status--error">
+        <p>{{ loadError() }}</p>
+        <button type="button" class="training-plan__btn" (click)="retry()">
+          Tentar de novo
+        </button>
+      </div>
+    } @else {
+      @if (hasPlan()) {
+        <section class="training-plan__hero">
+          <p class="training-plan__eyebrow">Plano ativo</p>
+          <h2 class="training-plan__plan-name">{{ plan()?.plan_name }}</h2>
+          <p class="training-plan__plan-meta">
+            Nível: <strong>{{ niceLevel(plan()?.level || '') }}</strong>
+          </p>
+        </section>
+
+        <section
+          class="training-plan__months"
+          aria-labelledby="training-plan-months-title"
+        >
+          <header class="training-plan__section-head">
+            <h3 id="training-plan-months-title">Meses do plano</h3>
+            <p class="training-plan__section-sub">
+              Comece um mês para destravar os treinos da semana.
+            </p>
+          </header>
+
+          @if (startError()) {
+            <p class="training-plan__inline-error">{{ startError() }}</p>
+          }
+
+          @if (months().length === 0) {
+            <p class="training-plan__status">
+              Nenhum mês disponível ainda neste plano.
+            </p>
+          } @else {
+            <ul class="training-plan__month-list">
+              @for (month of months(); track month.month_id) {
+                <li class="training-plan__month-card">
+                  <div class="training-plan__month-info">
+                    <span class="training-plan__month-badge">
+                      Mês {{ month.month_number }}
+                    </span>
+                    <h4 class="training-plan__month-title">
+                      {{ month.title || 'Mês ' + month.month_number }}
+                    </h4>
+                    @if (month.description) {
+                      <p class="training-plan__month-desc">
+                        {{ month.description }}
+                      </p>
+                    }
+                    <p class="training-plan__month-status">
+                      @if (month.is_completed) {
+                        <span class="training-plan__pill training-plan__pill--ok">
+                          Concluído
+                        </span>
+                      } @else if (month.is_started) {
+                        <span class="training-plan__pill training-plan__pill--warn">
+                          Em andamento
+                        </span>
+                      } @else if (!month.active) {
+                        <span class="training-plan__pill training-plan__pill--muted">
+                          Bloqueado
+                        </span>
+                      } @else {
+                        <span class="training-plan__pill">Não iniciado</span>
+                      }
+                    </p>
+                  </div>
+                  <div class="training-plan__month-actions">
+                    @if (month.is_started) {
+                      <button
+                        type="button"
+                        class="training-plan__btn training-plan__btn--primary"
+                        (click)="goToMonth(month)"
+                      >
+                        Ver treinos
+                      </button>
+                    } @else if (!month.active) {
+                      <span class="training-plan__pill training-plan__pill--muted">
+                        Mês ainda não liberado
+                      </span>
+                    } @else {
+                      <button
+                        type="button"
+                        class="training-plan__btn training-plan__btn--primary"
+                        [disabled]="startingMonth() !== null"
+                        (click)="startMonth(month)"
+                      >
+                        @if (startingMonth() === month.month_number) {
+                          Iniciando...
+                        } @else {
+                          Iniciar mês
+                        }
+                      </button>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      } @else {
+        <section class="training-plan__empty">
+          <p class="training-plan__eyebrow">Comece agora</p>
+          <h2 class="training-plan__plan-name">Você ainda não escolheu um plano</h2>
+          <p class="training-plan__plan-meta">
+            Selecione um nível para liberar seus 12 meses de treinos.
+          </p>
+        </section>
+      }
+
+      <section class="training-plan__levels" aria-label="Escolher nível">
+        <header class="training-plan__section-head">
+          <h3>{{ hasPlan() ? 'Trocar de nível' : 'Escolha um nível' }}</h3>
+          <p class="training-plan__section-sub">
+            Ao trocar de nível, sua seleção anterior é desativada.
+          </p>
+        </header>
+
+        @if (selectError()) {
+          <p class="training-plan__inline-error">{{ selectError() }}</p>
+        }
+
+        <div class="training-plan__levels-grid">
+          @for (level of ['iniciante', 'intermediario', 'avancado']; track level) {
+            <button
+              type="button"
+              class="training-plan__level-card"
+              [class.is-current]="isCurrentLevel(level)"
+              [disabled]="isSelectingLevel() !== null || isCurrentLevel(level)"
+              (click)="selectLevel($any(level))"
+            >
+              <span class="training-plan__level-name">{{ niceLevel(level) }}</span>
+              @if (isCurrentLevel(level)) {
+                <span class="training-plan__pill training-plan__pill--ok">
+                  Selecionado
+                </span>
+              } @else if (isSelectingLevel() === level) {
+                <span class="training-plan__pill">Selecionando...</span>
+              } @else {
+                <span class="training-plan__pill">Escolher</span>
+              }
+            </button>
+          }
+        </div>
+
+        @if (availablePlans().length > 0) {
+          <p class="training-plan__catalog-hint">
+            Catálogo: {{ availablePlans().length }} plano(s) disponíveis.
+          </p>
+        }
+      </section>
+    }
+  </main>
+</div>

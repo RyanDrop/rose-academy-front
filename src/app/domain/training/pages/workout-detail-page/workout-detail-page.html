@@ -1,0 +1,278 @@
+<div class="workout-detail">
+  <header class="workout-detail__topbar">
+    <a
+      [routerLink]="monthId() ? ['/treinos', 'mes', monthId()] : ['/treinos']"
+      class="workout-detail__back"
+      aria-label="Voltar"
+      ><mat-icon aria-hidden="true">arrow_back</mat-icon></a>
+    <h1 class="workout-detail__title">{{ workoutTopBarTitle() }}</h1>
+    <span class="workout-detail__topbar-spacer" aria-hidden="true"></span>
+  </header>
+
+  <main class="workout-detail__main">
+    @if (isLoading()) {
+      <p class="workout-detail__status">Carregando treino...</p>
+    } @else if (loadError()) {
+      <div class="workout-detail__status workout-detail__status--error">
+        <p>{{ loadError() }}</p>
+        <button type="button" class="workout-detail__btn" (click)="retry()">
+          Tentar de novo
+        </button>
+      </div>
+    } @else {
+      <section class="workout-detail__hero">
+        @if (header(); as h) {
+          <p class="workout-detail__eyebrow">
+            @if (h.day_number) {
+              Dia {{ h.day_number }}
+            }
+            @if (h.day_name) {
+              - {{ h.day_name }}
+            }
+          </p>
+          <h2 class="workout-detail__hero-title">
+            {{ h.title || "Treino" }}
+          </h2>
+          @if (h.description) {
+            <p class="workout-detail__hero-desc">{{ h.description }}</p>
+          }
+        } @else {
+          <p class="workout-detail__eyebrow">Treino</p>
+          <h2 class="workout-detail__hero-title">Detalhe do treino</h2>
+        }
+      </section>
+
+      <section class="workout-detail__session" aria-label="Semana do treino">
+        <header class="workout-detail__section-head">
+          <h3>Semana do treino</h3>
+          <p class="workout-detail__section-sub">
+            Escolha a semana (1-4) do mês em progresso. Você preenche as séries
+            durante o treino; ao final, envie tudo de uma vez no botão no fim da
+            página.
+          </p>
+        </header>
+
+        <div class="workout-detail__week-row">
+          <span class="workout-detail__week-label">Semana</span>
+          @for (n of [1, 2, 3, 4]; track n) {
+            <button
+              type="button"
+              class="workout-detail__week-btn"
+              [class.is-active]="weekNumber() === n"
+              (click)="changeWeekNumber(n)"
+              [disabled]="isCompleting() || sessionSynced()"
+            >
+              {{ n }}
+            </button>
+          }
+        </div>
+
+        <label class="workout-detail__field">
+          <span>Anotações do treino (opcional)</span>
+          <textarea
+            rows="2"
+            [value]="completionNotes()"
+            (input)="setNotes($any($event.target).value)"
+            [disabled]="isCompleting() || sessionSynced()"
+            placeholder="Como foi o treino?"
+          ></textarea>
+        </label>
+      </section>
+
+      <section class="workout-detail__exercises" aria-label="Exercícios">
+        <header class="workout-detail__section-head">
+          <h3>Exercícios</h3>
+          <p class="workout-detail__section-sub">
+            Cada exercício começa com o número de séries do plano; use
+            <strong>Adicionar série</strong> se precisar de mais. Preencha carga e
+            repetições em cada série durante o treino.
+          </p>
+        </header>
+
+        @if (exercises().length === 0) {
+          <p class="workout-detail__status">Sem exercícios cadastrados.</p>
+        } @else {
+          <ul class="workout-detail__exercise-list">
+            @for (row of exercises(); track row.entry.workout_exercise_id) {
+              <li class="workout-detail__exercise">
+                <header class="workout-detail__exercise-head">
+                  <h4 class="workout-detail__exercise-name">
+                    @if (row.entry.order_position) {
+                      <span class="workout-detail__exercise-order">
+                        {{ row.entry.order_position }}.
+                      </span>
+                    }
+                    {{ row.entry.exercise.name }}
+                  </h4>
+                  <p class="workout-detail__exercise-meta">
+                    @if (row.entry.exercise.target_muscle) {
+                      <span>{{ row.entry.exercise.target_muscle }}</span>
+                    }
+                    @if (row.entry.exercise.equipment) {
+                      <span>{{ row.entry.exercise.equipment }}</span>
+                    }
+                    <span>
+                      {{ row.entry.sets }}x{{ row.entry.reps || "-" }}
+                    </span>
+                    @if (row.entry.rest_time_seconds) {
+                      <span>{{ row.entry.rest_time_seconds }}s descanso</span>
+                    }
+                  </p>
+                  @if (row.entry.exercise.instructions) {
+                    <p class="workout-detail__exercise-notes">
+                      {{ row.entry.exercise.instructions }}
+                    </p>
+                  }
+                </header>
+
+                @if (row.entry.exercise.video_embed_url) {
+                  <div class="workout-detail__video">
+                    <iframe
+                      [src]="safeEmbedUrl(row.entry.exercise.video_embed_url)"
+                      [title]="'Vídeo: ' + row.entry.exercise.name"
+                      loading="lazy"
+                      allow="
+                        accelerometer;
+                        autoplay;
+                        clipboard-write;
+                        encrypted-media;
+                        gyroscope;
+                        picture-in-picture;
+                        web-share;
+                      "
+                      referrerpolicy="strict-origin-when-cross-origin"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+                } @else if (row.entry.exercise.video_url) {
+                  <a
+                    class="workout-detail__video-link"
+                    [href]="row.entry.exercise.video_url"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Assistir vídeo
+                  </a>
+                }
+
+                <div class="workout-detail__sets">
+                  @for (draft of row.drafts; track draft.draftId) {
+                    <div class="workout-detail__set">
+                      <span class="workout-detail__set-num">
+                        Série {{ draft.set_number }}
+                        @if (draft.saved) {
+                          <span class="workout-detail__set-sent">Enviada</span>
+                        }
+                      </span>
+                      <div class="workout-detail__set-pair">
+                        <label class="workout-detail__set-field">
+                          <span>Carga (kg)</span>
+                          <input
+                            type="number"
+                            inputmode="decimal"
+                            step="0.5"
+                            min="0"
+                            [(ngModel)]="draft.weight_used"
+                            [disabled]="inputsLocked(draft)"
+                          />
+                        </label>
+                        <label class="workout-detail__set-field">
+                          <span>Reps</span>
+                          <input
+                            type="number"
+                            inputmode="numeric"
+                            step="1"
+                            min="0"
+                            [(ngModel)]="draft.reps_completed"
+                            [disabled]="inputsLocked(draft)"
+                          />
+                        </label>
+                      </div>
+                      @if (showSaveOneSetButton(draft)) {
+                        <button
+                          type="button"
+                          class="workout-detail__btn workout-detail__btn--small"
+                          [disabled]="draft.saving || !hasSetPayload(draft)"
+                          (click)="logSet(row, draft)"
+                        >
+                          @if (draft.saving) {
+                            Salvando...
+                          } @else {
+                            Salvar
+                          }
+                        </button>
+                      }
+                      @if (draft.error) {
+                        <p class="workout-detail__inline-error">
+                          {{ draft.error }}
+                        </p>
+                      }
+                    </div>
+                  }
+                </div>
+
+                @if (canAddSet(row)) {
+                  <div class="workout-detail__add-set">
+                    <button
+                      type="button"
+                      class="workout-detail__btn workout-detail__btn--ghost"
+                      [disabled]="isCompleting()"
+                      (click)="addSet(row)"
+                    >
+                      + Adicionar série
+                    </button>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="workout-detail__finalize" aria-label="Concluir treino">
+        @if (sessionSynced()) {
+          <p class="workout-detail__inline-ok">
+            Treino concluído e séries enviadas. Você ainda pode adicionar séries
+            extras e salvar uma a uma, se precisar.
+          </p>
+        } @else {
+          <header class="workout-detail__section-head">
+            <h3>Enviar treino</h3>
+            <p class="workout-detail__section-sub">
+              Ao tocar no botão abaixo, registramos a conclusão do treino na semana
+              escolhida e enviamos em lote todas as séries que tiverem carga ou
+              repetições preenchidas.
+            </p>
+          </header>
+
+          @if (completeError()) {
+            <p class="workout-detail__inline-error">{{ completeError() }}</p>
+          }
+
+          <button
+            type="button"
+            class="workout-detail__btn workout-detail__btn--primary"
+            [disabled]="isCompleting()"
+            (click)="finishWorkoutAndSync()"
+          >
+            @if (isCompleting()) {
+              Enviando...
+            } @else {
+              Concluir treino e enviar séries
+            }
+          </button>
+        }
+      </section>
+
+      <div class="workout-detail__footer">
+        <button
+          type="button"
+          class="workout-detail__btn"
+          (click)="goBackToMonth()"
+        >
+          Voltar ao mês
+        </button>
+      </div>
+    }
+  </main>
+</div>

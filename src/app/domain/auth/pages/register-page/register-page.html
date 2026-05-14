@@ -37,7 +37,7 @@
             </h1>
             <p class="register-page__subtitle">
               Conta na API, perfil com PATCH /auth/me, metas e planos do
-              catalogo, checkout Abacate Pay no final.
+              catálogo, checkout Abacate Pay no final.
             </p>
           </div>
         </div>
@@ -62,8 +62,8 @@
                   <h2 class="register-page__step-title">Dados da conta</h2>
                 </div>
                 <p class="register-page__step-copy">
-                  Enviamos nome, CPF, email e senha para POST /auth/register e
-                  recebemos o JWT da sessao.
+                  Enviamos nome, CPF, e-mail e senha para POST /auth/register e
+                  recebemos o JWT da sessão.
                 </p>
               </div>
 
@@ -111,17 +111,17 @@
                 }
                 @if (hasAccountError("cpf", "cpfIncomplete")) {
                   <span class="register-page__error"
-                    >O CPF precisa ter 11 digitos.</span
+                    >O CPF precisa ter 11 dígitos.</span
                   >
                 }
                 @if (hasAccountError("cpf", "cpf")) {
-                  <span class="register-page__error">CPF invalido.</span>
+                  <span class="register-page__error">CPF inválido.</span>
                 }
               </div>
 
               <div class="register-page__field">
                 <label class="register-page__label" for="register-email"
-                  >Email</label
+                  >E-mail</label
                 >
                 <input
                   id="register-email"
@@ -132,10 +132,10 @@
                   autocomplete="email"
                 />
                 @if (hasAccountError("email", "required")) {
-                  <span class="register-page__error">Informe o email.</span>
+                  <span class="register-page__error">Informe o e-mail.</span>
                 }
                 @if (hasAccountError("email", "email")) {
-                  <span class="register-page__error">Use um email valido.</span>
+                  <span class="register-page__error">Use um e-mail válido.</span>
                 }
               </div>
 
@@ -160,8 +160,8 @@
                     hasAccountError("password", "passwordComplexity")
                   ) {
                     <span class="register-page__error">
-                      Use 8+ caracteres com maiuscula, minuscula, numero e
-                      simbolo.
+                      Use 8+ caracteres com maiúscula, minúscula, número e
+                      símbolo.
                     </span>
                   }
                 </div>
@@ -200,7 +200,7 @@
 
               <div class="register-page__actions">
                 <a class="register-page__text-link" routerLink="/auth/login"
-                  >Ja tenho conta</a
+                  >Já tenho conta</a
                 >
                 <button
                   class="register-page__submit"
@@ -227,7 +227,7 @@
                 </div>
                 <p class="register-page__step-copy">
                   Metas vêm de GET /goals. Ao avançar, PATCH /auth/me grava o
-                  perfil e carregamos GET /products para o proximo passo.
+                  perfil e carregamos GET /products para o próximo passo.
                 </p>
               </div>
 
@@ -246,7 +246,7 @@
                     <option value="masculino">Masculino</option>
                     <option value="outro">Outro</option>
                     <option value="prefiro_nao_dizer">
-                      Prefiro nao informar
+                      Prefiro não informar
                     </option>
                   </select>
                   @if (hasProfileError("gender", "required")) {
@@ -388,7 +388,7 @@
                   />
                   @if (hasProfileError("cellphone", "invalidPhone")) {
                     <span class="register-page__error"
-                      >Use 10 ou 11 digitos.</span
+                      >Use 10 ou 11 dígitos.</span
                     >
                   }
                 </div>
@@ -433,7 +433,7 @@
                       <span class="register-page__upload-icon">+</span>
                       <div>
                         <strong>Adicione uma foto do aluno</strong>
-                        <p>PNG ou JPG com ate 5 MB.</p>
+                        <p>PNG ou JPG com até 5 MB.</p>
                       </div>
                       <button
                         class="register-page__upload-button"

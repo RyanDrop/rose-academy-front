@@ -12,6 +12,8 @@ export interface ApiTrainingMonth {
   title: string;
   plan_id?: string;
   is_active?: boolean;
+  /** Liberado pela idade da conta (catalogo enriquecido pela API). */
+  active?: boolean;
   [key: string]: unknown;
 }
 
@@ -72,6 +74,7 @@ export function normalizeTrainingPlans(plans: ApiTrainingPlan[]): TrainingPlanVi
           month_number: monthNumberValue(m.month_number),
           title: typeof m.title === 'string' ? m.title : '',
           subtitle: typeof m.subtitle === 'string' ? m.subtitle : '',
+          active: m.active === true,
         }))
         .sort((a, b) => a.month_number - b.month_number);
       return {

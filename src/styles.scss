@@ -90,3 +90,28 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+/* Entrada suave ao trocar de rota (componente irmao ao router-outlet). */
+@keyframes ra-route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ra-root router-outlet + * {
+  display: block;
+  min-height: 100dvh;
+  animation: ra-route-enter 0.42s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ra-root router-outlet + * {
+    animation: none;
+  }
+}

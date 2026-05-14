@@ -338,6 +338,54 @@
   }
 }
 
+button.home-trainings__card {
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.home-trainings__card--locked {
+  opacity: 0.58;
+  cursor: not-allowed;
+  filter: grayscale(0.22);
+
+  &:hover {
+    transform: none;
+    box-shadow: var(--ra-shadow-soft);
+    border-color: rgba(16, 24, 32, 0.08);
+  }
+}
+
+.home-trainings__card--opening {
+  pointer-events: none;
+  opacity: 0.88;
+}
+
+.home-trainings__card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ra-space-2);
+  margin-top: var(--ra-space-3);
+}
+
+.home-trainings__card-lock {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--ra-radius-pill);
+  color: var(--ra-color-primary-deep);
+  border: 1px solid rgba(88, 41, 51, 0.2);
+  background: rgba(16, 24, 32, 0.06);
+}
+
 .home-trainings__card--intro {
   cursor: default;
 
@@ -397,7 +445,7 @@
 
 .home-trainings__badge {
   align-self: flex-start;
-  margin-top: var(--ra-space-3);
+  margin-top: 0;
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.08em;

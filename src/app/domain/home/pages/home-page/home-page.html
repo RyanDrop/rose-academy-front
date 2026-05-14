@@ -2,12 +2,9 @@
   <header class="home-page__header">
     <div class="home-page__brand">
       <span class="home-page__brand-mark">RA</span>
-      <div class="home-page__brand-text">
-        <span class="home-page__brand-name">Rosi Nascimento Personal</span>
-        <span class="home-page__brand-tag">Área do aluno</span>
-      </div>
     </div>
     <nav class="home-page__nav" aria-label="Conta">
+      <a routerLink="/treinos" class="home-page__logout">Meus treinos</a>
       <button type="button" class="home-page__logout" (click)="logout()">
         Sair
       </button>
@@ -16,7 +13,7 @@
 
   <main class="home-page__main">
     <section class="home-page__hero" aria-labelledby="home-welcome-title">
-      <p class="home-page__eyebrow">Inicio</p>
+      <p class="home-page__eyebrow">Início</p>
       <h1 id="home-welcome-title" class="home-page__title">
         Olá, {{ displayName() }}
       </h1>
@@ -33,7 +30,7 @@
       </p>
     </section>
 
-    <section class="home-trainings" aria-label="Treinos disponiveis">
+    <section class="home-trainings" aria-label="Treinos disponíveis">
       <div class="home-trainings__inner">
         <header class="home-trainings__intro-head">
           <h2 class="home-trainings__intro-title">Introdução</h2>
@@ -58,6 +55,12 @@
             </article>
           }
         </div>
+
+        @if (monthOpenError()) {
+          <p class="home-trainings__status home-trainings__status--error">
+            {{ monthOpenError() }}
+          </p>
+        }
 
         @if (trainingPlansLoading()) {
           <p class="home-trainings__status">Carregando treinos...</p>
@@ -89,11 +92,22 @@
             </header>
             <div class="home-trainings__rail" role="list">
               @for (month of plan.months; track month.id) {
-                <a
+                <button
+                  type="button"
                   class="home-trainings__card home-trainings__card--month"
+                  [class.home-trainings__card--locked]="
+                    !isMonthUnlocked(plan, month)
+                  "
+                  [class.home-trainings__card--opening]="
+                    openingMonthCardKey() === monthCardKey(plan, month)
+                  "
                   role="listitem"
-                  [routerLink]="['/home']"
-                  [queryParams]="{ planId: plan.id, monthId: month.id }"
+                  [disabled]="
+                    trainingPlansLoading() ||
+                    openingMonthCardKey() !== null ||
+                    !isMonthUnlocked(plan, month)
+                  "
+                  (click)="onMonthCardClick(plan, month)"
                 >
                   <div
                     class="home-trainings__card-visual month"
@@ -107,10 +121,20 @@
                       {{ month.subtitle }}
                     </p>
                   }
-                  <span class="home-trainings__badge">{{
-                    monthBadgeLabel(month.month_number)
-                  }}</span>
-                </a>
+                  <div class="home-trainings__card-footer">
+                    <span class="home-trainings__badge">{{
+                      monthBadgeLabel(month.month_number)
+                    }}</span>
+                    @if (!isMonthUnlocked(plan, month)) {
+                      <span
+                        class="home-trainings__card-lock"
+                        aria-hidden="true"
+                      >
+                        Bloqueado
+                      </span>
+                    }
+                  </div>
+                </button>
               }
             </div>
           </div>

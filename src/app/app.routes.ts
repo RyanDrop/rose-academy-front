@@ -17,6 +17,13 @@ export const routes: Routes = [
       import('./domain/home/home.routes').then((module) => module.HOME_ROUTES),
   },
   {
+    path: 'treinos',
+    loadChildren: () =>
+      import('./domain/training/training.routes').then(
+        (module) => module.TRAINING_ROUTES,
+      ),
+  },
+  {
     path: '**',
     redirectTo: 'auth/login',
   },

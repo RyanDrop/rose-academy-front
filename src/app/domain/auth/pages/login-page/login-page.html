@@ -24,9 +24,9 @@
               subtitle="Entre para assistir aulas, abrir materiais e seguir a sua evolução."
               accentLabel="Login"
               [badges]="[
-                'Acesso rapido',
+                'Acesso rápido',
                 'Treino em dia',
-                'Conteudo exclusivo',
+                'Conteúdo exclusivo',
               ]"
               [metrics]="heroMetrics"
             />
@@ -39,7 +39,7 @@
                 <span class="login-page__brand-name"
                   >Rosi Nascimento Personal</span
                 >
-                <span class="login-page__brand-copy">Area do aluno</span>
+                <span class="login-page__brand-copy">Área do aluno</span>
               </div>
             </div>
 
@@ -47,8 +47,8 @@
               <span class="login-page__eyebrow">Login</span>
               <h1 class="login-page__title">Entre para continuar o treino</h1>
               <p class="login-page__subtitle">
-                Entre com sua conta Rosi Nascimento Personal; a sessao e
-                guardada neste dispositivo conforme a opcao abaixo.
+                Entre com sua conta Rosi Nascimento Personal; a sessão é
+                guardada neste dispositivo conforme a opção abaixo.
               </p>
             </div>
 
@@ -71,20 +71,20 @@
               novalidate
             >
               <div class="login-page__field">
-                <label class="login-page__label" for="login-email">Email</label>
+                <label class="login-page__label" for="login-email">E-mail</label>
                 <input
                   id="login-email"
                   class="login-page__input"
                   type="email"
                   formControlName="email"
-                  placeholder="voce@exemplo.com"
+                  placeholder="você@exemplo.com"
                   autocomplete="email"
                 />
                 @if (hasError("email", "required")) {
-                  <span class="login-page__error">Informe seu email.</span>
+                  <span class="login-page__error">Informe seu e-mail.</span>
                 }
                 @if (hasError("email", "email")) {
-                  <span class="login-page__error">Use um email valido.</span>
+                  <span class="login-page__error">Use um e-mail válido.</span>
                 }
               </div>
 
@@ -112,7 +112,7 @@
 
               <label class="login-page__checkbox">
                 <input type="checkbox" formControlName="rememberSession" />
-                <span>Manter sessao neste dispositivo</span>
+                <span>Manter sessão neste dispositivo</span>
               </label>
 
               <button
